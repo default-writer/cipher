@@ -1,0 +1,15 @@
+{
+  "name": "caesar-cipher-plus-one",
+  "license": "MIT",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "svelte": "3.12.1"
+  },
+  "dependencies": {
+    "chart.js": "4.5.1"
+  },
+  "scripts": {
+    "test": "jest"
+  }
+}
