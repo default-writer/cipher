@@ -4,7 +4,7 @@ export const default_alphabet = [
 ];
 
 function sort(array) {
-  return array.sort(function(a, b) {
+  return array.sort(function (a, b) {
     var firstLetter = a[0],
       firstNum = a[1],
       secondLetter = b[0],
@@ -37,14 +37,14 @@ export function chars(text) {
 
 export function frequency(text) {
   var count = {};
-  text.split("").map(s => (count[s] = count[s] ? count[s] + 1 : 1));
+  [...text].map(s => (count[s] = count[s] ? count[s] + 1 : 1));
   return Object.keys(count)
     .sort()
     .reduce((acc, curr) => ({ ...acc, [curr]: count[curr] }), {});
 }
 
 export function convert(obj) {
-  return Object.keys(obj).map(function(key) {
+  return Object.keys(obj).map(function (key) {
     return [key, obj[key]];
   });
 }

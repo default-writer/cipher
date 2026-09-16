@@ -1,4 +1,5 @@
 import { Chart } from "chart.js/auto";
+import { encode, decode } from "../js/utils";
 
 import {
   sha1,
@@ -184,10 +185,10 @@ const ux = {
       const originalPlaintext = this.plaintext1.value;
       const isValidDecryption = (candidateText) => {
         try {
-          const safeCipherText = String(candidateText);
-          const alphabetArray = this.alphabet2.value ? [...this.alphabet2.value] : [];
-          const decryptedResult = chipher.decrypt(safeCipherText, this.IV2.value, parseInt(this.shift2.value, 10) || 0, alphabetArray, this.sha_2.value);
-          const decryptedString = Array.isArray(decryptedResult) ? decryptedResult.join("") : decryptedResult;
+          const safeCipherText = [...candidateText];
+          const alphabetArray = this.alphabet1.value ? [...this.alphabet1.value] : [];
+          const decryptedResult = decode(chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value), [...default_alphabet]);
+          const decryptedString = decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
           console.error("error:", e);
@@ -196,7 +197,7 @@ const ux = {
       };
       if (!isValidDecryption(text)) { console.error("failed"); return; }
       let iterations = 0;
-      const maxSafetyCounter = 5000;
+      const maxSafetyCounter = 1000;
       while (iterations < maxSafetyCounter) {
         iterations++;
         const frequencies = {};
@@ -227,16 +228,15 @@ const ux = {
         }
         if (indexes.length > 0) {
           const randomIndex = indexes[Math.floor(Math.random() * indexes.length)];
-          const candidateText = text.substring(0, randomIndex) + replacement + text.substring(randomIndex + 1);
+          const candidateText = [...text.slice(0, randomIndex), ...replacement, ...text.slice(randomIndex + 1)];
           if (isValidDecryption(candidateText)) {
             text = candidateText;
           } else {
             console.warn(`rollback on ${iterations}: as '${targetChar}' -> '${replacement}' failed the integrity check.`);
-            break;
           }
         }
       }
-      this.output1.value = text;
+      this.output1.value = text.join("");
       decrypt();
       this.update_chart1(text);
       this.update_chart3(text);
@@ -387,7 +387,7 @@ function prepare2_() {
 
 function encrypt() {
   var result = chipher.encrypt(
-    encodeToCustomAlphabet(ux.plaintext1.value),
+    encode(ux.plaintext1.value, [...default_alphabet]),
     ux.IV1.value,
     ux.shift1.value,
     ux.alphabet1.value,
@@ -399,13 +399,13 @@ function encrypt() {
 }
 
 function decrypt() {
-  var result = chipher.decrypt(
+  var result = decode(chipher.decrypt(
     ux.plaintext2.value,
     ux.IV2.value,
     ux.shift2.value,
     ux.alphabet2.value,
     ux.sha_2.value
-  );
+  ), [...default_alphabet]);
   ux.output2.value = result;
   ux.update_chart2(result);
   ux.update_chart4(result);

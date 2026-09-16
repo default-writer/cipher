@@ -46,8 +46,8 @@ function previous_position(char) {
 }
 
 function shift_encrypt(char) {
-  if (char === undefined || !alphabet.includes(char))
-    throw Error("invalid symbol '" + char + "'");
+  //if (char === undefined || !alphabet.includes(char))
+  //  throw Error("invalid symbol '" + char + "'");
   const position = alphabet.indexOf(char);
   let newPosition = next_position(char);
   while (newPosition === position) newPosition = next_position(char);
@@ -55,8 +55,8 @@ function shift_encrypt(char) {
 }
 
 function shift_decrypt(char) {
-  if (char === undefined || !alphabet.includes(char))
-    throw Error("invalid char '" + char + "'");
+  //if (char === undefined || !alphabet.includes(char))
+  //  throw Error("invalid char '" + char + "'");
   const position = alphabet.indexOf(char);
   let newPosition = previous_position(char);
   while (newPosition === position) newPosition = previous_position(char);
@@ -69,7 +69,7 @@ export var plaintext = [...default_plaintext];
 export function set_alphabet(text) { alphabet = [...text]; }
 export function set_plaintext(text) { plaintext = [...text]; }
 export function random() { return Math.floor(rnd.next(min, max)); }
-export function sha1(array) { if (typeof array === "string") array = [array]; return hex_sha1(array.join("")); }
+export function sha1(array) { return hex_sha1(String(array)); }
 export function decrypt_cipher(...chars) { return cipher_function(shift_decrypt)(...chars); }
 export function encrypt_cipher(...chars) { return cipher_function(shift_encrypt)(...chars); }
 export function random_key() { shuffle(alphabet, random()); }

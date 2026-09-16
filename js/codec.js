@@ -1,85 +1,87 @@
 import { sha1, encrypt_cipher, decrypt_cipher } from "./cipher";
+import { default_alphabet } from "./alphabet";
+import { encode, decode } from "./utils";
 
 function encrypt_plain_(input, iv, shift, alphabet, sha) {
-  const result = encrypt_cipher(
+  const result = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...input],
     sha,
     sha1([String(...iv)])
-  ).join("");
+  )];
   return result;
 }
 
 function decrypt_plain_(input, iv, shift, alphabet, sha) {
   const decryptedString = input;
-  const result = decrypt_cipher(
+  const result = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...decryptedString],
     sha,
     sha1([String(...iv)])
-  ).join("");
+  )];
   return result;
 }
 
 function encrypt_(input, iv, shift, alphabet, sha) {
-  const str1 = encrypt_cipher(
+  const str1 = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...input],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  const str2 = encrypt_cipher(
+  )];
+  const str2 = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...str1],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  let str3 = encrypt_cipher(
+  )];
+  let str3 = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...str2],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  let str4 = encrypt_cipher(
+  )];
+  let str4 = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...str3],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  let str5 = encrypt_cipher(
+  )];
+  let str5 = [...encrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
     [...str4],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  return str1 + str2 + str3 + str4 + str5;
+  )];
+  return [...str1, ...str2, ...str3, ...str4, ...str5].join("");
 }
 
 function decrypt_(input, iv, shift, alphabet, sha) {
   const partLength = Math.floor(input.length / 5);
-  const result1 = decrypt_cipher(
+  const result1 = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
-    [...input.substring(0, partLength)],
+    [...input.slice(0, partLength)],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  const result2 = decrypt_cipher(
+  )];
+  const result2 = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
@@ -88,15 +90,15 @@ function decrypt_(input, iv, shift, alphabet, sha) {
         parseInt(iv, 10),
         Number(shift),
         [...alphabet],
-        [...input.substring(partLength, partLength * 2)],
+        [...input.slice(partLength, partLength * 2)],
         sha,
         sha1([String(...iv)])
-      ).join(""),
+      ),
     ],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  const result3 = decrypt_cipher(
+  )];
+  const result3 = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
@@ -110,19 +112,19 @@ function decrypt_(input, iv, shift, alphabet, sha) {
             parseInt(iv, 10),
             Number(shift),
             [...alphabet],
-            [...input.substring(partLength * 2, partLength * 3)],
+            [...input.slice(partLength * 2, partLength * 3)],
             sha,
             sha1([String(...iv)])
-          ).join(""),
+          ),
         ],
         sha,
         sha1([String(...iv)])
-      ).join(""),
+      ),
     ],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  const result4 = decrypt_cipher(
+  )];
+  const result4 = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
@@ -141,23 +143,23 @@ function decrypt_(input, iv, shift, alphabet, sha) {
                 parseInt(iv, 10),
                 Number(shift),
                 [...alphabet],
-                [...input.substring(partLength * 3, partLength * 4)],
+                [...input.slice(partLength * 3, partLength * 4)],
                 sha,
                 sha1([String(...iv)])
-              ).join(""),
+              ),
             ],
             sha,
             sha1([String(...iv)])
-          ).join(""),
+          ),
         ],
         sha,
         sha1([String(...iv)])
-      ).join(""),
+      ),
     ],
     sha,
     sha1([String(...iv)])
-  ).join("");
-  const result5 = decrypt_cipher(
+  )];
+  const result5 = [...decrypt_cipher(
     parseInt(iv, 10),
     Number(shift),
     [...alphabet],
@@ -181,26 +183,26 @@ function decrypt_(input, iv, shift, alphabet, sha) {
                     parseInt(iv, 10),
                     Number(shift),
                     [...alphabet],
-                    [...input.substring(partLength * 4)],
+                    [...input.slice(partLength * 4)],
                     sha,
                     sha1([String(...iv)])
-                  ).join(""),
+                  ),
                 ],
                 sha,
                 sha1([String(...iv)])
-              ).join(""),
+              ),
             ],
             sha,
             sha1([String(...iv)])
-          ).join(""),
+          ),
         ],
         sha,
         sha1([String(...iv)])
-      ).join(""),
+      ),
     ],
     sha,
     sha1([String(...iv)])
-  ).join("");
+  )];
   const str1 = result1;
   const str2 = result2;
   const str3 = result3;

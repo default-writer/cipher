@@ -1,4 +1,4 @@
-import { chipher } from "../js/codec";
+import { chipher } from "./../js/codec";
 
 describe("recover tests", () => {
   const plaintext = "NASA_MARS";
@@ -17,16 +17,9 @@ describe("recover tests", () => {
   test("test: 100% errors on 1 channel(s)", () => {
     const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
     const partLength = Math.floor(cipherText.length / 5);
-    const brokenCipherText =
-      "X".repeat(partLength) + cipherText.substring(partLength);
+    const brokenCipherText = [..."X".repeat(partLength), ...cipherText.slice(partLength)];
 
-    const restoredText = chipher.decrypt(
-      brokenCipherText,
-      iv,
-      shift,
-      alphabet,
-      sha
-    );
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
     expect(restoredText).toBe(plaintext);
   });
 
@@ -34,16 +27,9 @@ describe("recover tests", () => {
     const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
     const partLength = Math.floor(cipherText.length / 5);
     const badStream = "X".repeat(partLength);
-    const brokenCipherText =
-      badStream + badStream + cipherText.substring(partLength * 2);
+    const brokenCipherText = [...badStream, ...badStream, ...cipherText.slice(partLength * 2)];
 
-    const restoredText = chipher.decrypt(
-      brokenCipherText,
-      iv,
-      shift,
-      alphabet,
-      sha
-    );
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
 
     expect([plaintext, "X".repeat(plaintext.length)]).toContain(restoredText);
   });
@@ -53,11 +39,11 @@ describe("recover tests", () => {
     const partLength = Math.floor(cipherText.length / 5);
 
     let channels = [
-      cipherText.substring(0, partLength).split(""),
-      cipherText.substring(partLength, partLength * 2).split(""),
-      cipherText.substring(partLength * 2, partLength * 3).split(""),
-      cipherText.substring(partLength * 3, partLength * 4).split(""),
-      cipherText.substring(partLength * 4).split(""),
+      [...cipherText.slice(0, partLength)],
+      [...cipherText.slice(partLength, partLength * 2)],
+      [...cipherText.slice(partLength * 2, partLength * 3)],
+      [...cipherText.slice(partLength * 3, partLength * 4)],
+      [...cipherText.slice(partLength * 4)],
     ];
 
     let visualMatrix = [["ch1"], ["ch2"], ["ch3"], ["ch4"], ["ch5"]];
@@ -73,14 +59,8 @@ describe("recover tests", () => {
 
     console.table(visualMatrix);
 
-    const brokenCipherText = channels.map((ch) => ch.join("")).join("");
-    const restoredText = chipher.decrypt(
-      brokenCipherText,
-      iv,
-      shift,
-      alphabet,
-      sha
-    );
+    const brokenCipherText = channels.flatMap((ch) => ch);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
 
     expect(restoredText).toBe(plaintext);
   });
@@ -90,11 +70,11 @@ describe("recover tests", () => {
     const partLength = Math.floor(cipherText.length / 5);
 
     let channels = [
-      cipherText.substring(0, partLength).split(""),
-      cipherText.substring(partLength, partLength * 2).split(""),
-      cipherText.substring(partLength * 2, partLength * 3).split(""),
-      cipherText.substring(partLength * 3, partLength * 4).split(""),
-      cipherText.substring(partLength * 4).split(""),
+      [...cipherText.slice(0, partLength)],
+      [...cipherText.slice(partLength, partLength * 2)],
+      [...cipherText.slice(partLength * 2, partLength * 3)],
+      [...cipherText.slice(partLength * 3, partLength * 4)],
+      [...cipherText.slice(partLength * 4)],
     ];
 
     let visualMatrix = [["ch1"], ["ch2"], ["ch3"], ["ch4"], ["ch5"]];
@@ -107,22 +87,14 @@ describe("recover tests", () => {
       channels[randomChannelIdx1][i] = badChar1;
       channels[randomChannelIdx2][i] = badChar2;
       for (let c = 0; c < 5; c++) {
-        visualMatrix[c].push(
-          c === randomChannelIdx1 || c === randomChannelIdx2 ? "x" : "o"
-        );
+        visualMatrix[c].push(c === randomChannelIdx1 || c === randomChannelIdx2 ? "x" : "o");
       }
     }
 
     console.table(visualMatrix);
 
-    const brokenCipherText = channels.map((ch) => ch.join("")).join("");
-    const restoredText = chipher.decrypt(
-      brokenCipherText,
-      iv,
-      shift,
-      alphabet,
-      sha
-    );
+    const brokenCipherText = channels.flatMap((ch) => ch);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
 
     expect(restoredText).toBe(plaintext);
   });

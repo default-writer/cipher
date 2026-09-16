@@ -1,4 +1,4 @@
-const default_plaintext = `The atmosphere of Mars is about 100 times thinner than Earth's, and it is 95 percent carbon dioxide. Here's a breakdown of its composition, according to a NASA fact sheet:
+const default_plaintext = `🍎🍏 The atmosphere of Mars is about 100 times thinner than Earth's, and it is 95 percent carbon dioxide. Here's a breakdown of its composition, according to a NASA fact sheet:
 
 Carbon dioxide: 95.32 percent
 Nitrogen: 2.7 percent
