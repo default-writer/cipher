@@ -387,7 +387,7 @@ function prepare2_() {
 
 function encrypt() {
   var result = chipher.encrypt(
-    ux.plaintext1.value,
+    encodeToCustomAlphabet(ux.plaintext1.value),
     ux.IV1.value,
     ux.shift1.value,
     ux.alphabet1.value,
