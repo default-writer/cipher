@@ -22,8 +22,6 @@ const ux = {
   plaintext1: document.getElementById("plaintext1"),
   IV1: document.getElementById("IV1"),
   output1: document.getElementById("output1"),
-  input1: document.getElementById("input1"),
-  replace1: document.getElementById("replace1"),
   convert1: document.getElementById("convert1"),
   sha_plaintext1: document.getElementById("sha_plaintext1"),
   sha_1: document.getElementById("sha_1"),
@@ -36,16 +34,11 @@ const ux = {
   plaintext2: document.getElementById("plaintext2"),
   IV2: document.getElementById("IV2"),
   output2: document.getElementById("output2"),
-  input2: document.getElementById("input2"),
-  replace2: document.getElementById("replace2"),
-  convert2: document.getElementById("convert2"),
   sha_plaintext2: document.getElementById("sha_plaintext2"),
   sha_2: document.getElementById("sha_2"),
   shift2: document.getElementById("shift2"),
   app1: document.getElementById("app1"),
   app2: document.getElementById("app2"),
-  apply1: document.getElementById("apply1"),
-  apply2: document.getElementById("apply2"),
   randomize: document.getElementById("randomize"),
   alphabet_random: document.getElementById("alphabet_random"),
   alphabet_default: document.getElementById("alphabet_default"),
@@ -247,56 +240,6 @@ const ux = {
       decrypt();
       this.update_chart1(text);
       this.update_chart3(text);
-    });
-    apply1.addEventListener("click", (event) => {
-      event.preventDefault();
-      let text = this.output1.value;
-      const targetChar = this.input1.value;
-      const replacement = this.replace1.value;
-      if (targetChar && text.includes(targetChar)) {
-        const indexes = [];
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] === targetChar) {
-            indexes.push(i);
-          }
-        }
-        if (indexes.length > 0) {
-          const randomIndex =
-            indexes[Math.floor(Math.random() * indexes.length)];
-          text =
-            text.substring(0, randomIndex) +
-            replacement +
-            text.substring(randomIndex + 1);
-          this.output1.value = text;
-        }
-      }
-      this.update_chart1(text);
-      this.update_chart3(text);
-    });
-    apply2.addEventListener("click", (event) => {
-      event.preventDefault();
-      let text = this.output2.value;
-      const targetChar = this.input2.value;
-      const replacement = this.replace2.value;
-      if (targetChar && text.includes(targetChar)) {
-        const indexes = [];
-        for (let i = 0; i < text.length; i++) {
-          if (text[i] === targetChar) {
-            indexes.push(i);
-          }
-        }
-        if (indexes.length > 0) {
-          const randomIndex =
-            indexes[Math.floor(Math.random() * indexes.length)];
-          text =
-            text.substring(0, randomIndex) +
-            replacement +
-            text.substring(randomIndex + 1);
-          this.output2.value = text;
-        }
-      }
-      this.update_chart2(text);
-      this.update_chart4(text);
     });
     app1.addEventListener("click", (event) => {
       event.preventDefault();
