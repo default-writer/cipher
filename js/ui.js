@@ -53,9 +53,6 @@ const ux = {
   encrypt: document.getElementById("encrypt"),
   decrypt: document.getElementById("decrypt"),
   init: function () {
-    chipher.selector(function (a, b) {
-      return a;
-    });
     this.chart1 = new Chart(
       document.getElementById("myChart1").getContext("2d"),
       {
@@ -187,219 +184,67 @@ const ux = {
       );
       saveAs(blob, "settings-public.json");
     });
-    // convert1.addEventListener("click", (event) => {
-    //   event.preventDefault();
-
-    //   let text = this.output1.value;
-    //   if (!text || text.length === 0) return;
-
-    //   for (let i_ = 0; i_ < 32; i_++) {
-    //     // 1. Считаем частоту каждого символа в тексте
-    //     const frequencies = {};
-    //     for (const char of text) {
-    //       frequencies[char] = (frequencies[char] || 0) + 1;
-    //     }
-
-    //     // 2. Находим экстремумы (максимальную и минимальную частоту)
-    //     let maxCount = 0;
-    //     let minCount = Infinity;
-
-    //     for (const char in frequencies) {
-    //       if (frequencies[char] > maxCount) maxCount = frequencies[char];
-    //       if (frequencies[char] < minCount) minCount = frequencies[char];
-    //     }
-
-    //     // 3. Собираем списки кандидатов (если символов с одинаковой частотой несколько)
-    //     const mostFrequentChars = [];
-    //     const leastFrequentChars = [];
-
-    //     for (const char in frequencies) {
-    //       if (frequencies[char] === maxCount) mostFrequentChars.push(char);
-    //       if (frequencies[char] === minCount) leastFrequentChars.push(char);
-    //     }
-
-    //     // 4. Случайно выбираем один самый частый и один самый редкий символ
-    //     const targetChar =
-    //       mostFrequentChars[
-    //         Math.floor(Math.random() * mostFrequentChars.length)
-    //       ];
-    //     const replacement =
-    //       leastFrequentChars[
-    //         Math.floor(Math.random() * leastFrequentChars.length)
-    //       ];
-
-    //     // Защита: если самый частый и самый редкий символ — это один и тот же символ (в тексте всего 1 уникальный символ), ничего не делаем
-    //     if (targetChar === replacement) return;
-
-    //     // 5. Находим все индексы вхождений выбранного частого символа
-    //     const indexes = [];
-    //     for (let i = 0; i < text.length; i++) {
-    //       if (text[i] === targetChar) {
-    //         indexes.push(i);
-    //       }
-    //     }
-
-    //     // 6. Заменяем ровно одно случайное вхождение
-    //     if (indexes.length > 0) {
-    //       const randomIndex =
-    //         indexes[Math.floor(Math.random() * indexes.length)];
-
-    //       text =
-    //         text.substring(0, randomIndex) +
-    //         replacement +
-    //         text.substring(randomIndex + 1);
-
-    //       // Перезаписываем текст в интерфейсе
-    //       this.output1.value = text;
-    //     }
-    //   }
-
-    //   // 7. Обновляем левые графики
-    //   this.update_chart1(text);
-    //   this.update_chart3(text);
-    // });
-    convert1.addEventListener("click", (event) => {
+    this.convert1.addEventListener("click", (event) => {
       event.preventDefault();
-
       let text = this.output1.value;
       if (!text || text.length === 0) return;
-
-      // Берем оригинальный plaintext из левой колонки для проверки целостности
       const originalPlaintext = this.plaintext1.value;
-
-      // Функция валидации: проверяет, расшифруется ли кандидатная строка обратно в оригинал
       const isValidDecryption = (candidateText) => {
         try {
-          // ИСПРАВЛЕНИЕ БАГА ИТЕРИРОВАНИЯ:
-          // 1. Принудительно приводим кандидат к строковому примитиву String(), чтобы Babel-спред внутри codec.js не падал
           const safeCipherText = String(candidateText);
-
-          // 2. Преобразуем строку алфавита в итерируемый массив (как требует codec.js)
-          const alphabetArray = this.alphabet2.value
-            ? [...this.alphabet2.value]
-            : [];
-
-          // 3. Вызываем дешифратор с явными параметрами, идентично вашему тест-кейсу
-          const decryptedResult = chipher.decrypt(
-            safeCipherText,
-            this.IV2.value,
-            parseInt(this.shift2.value, 10) || 0,
-            alphabetArray,
-            this.sha_2.value
-          );
-
-          // Проверяем результат (если дешифратор вернул массив символов, склеиваем в строку)
-          const decryptedString = Array.isArray(decryptedResult)
-            ? decryptedResult.join("")
-            : decryptedResult;
-
-          // Возвращаем true, если восстановленный текст совпадает с исходным
+          const alphabetArray = this.alphabet2.value ? [...this.alphabet2.value] : [];
+          const decryptedResult = chipher.decrypt(safeCipherText, this.IV2.value, parseInt(this.shift2.value, 10) || 0, alphabetArray, this.sha_2.value);
+          const decryptedString = Array.isArray(decryptedResult) ? decryptedResult.join("") : decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
-          console.error("Ошибка во время тестового декодирования:", e);
+          console.error("error:", e);
           return false;
         }
       };
-
-      // Стартовая проверка устойчивости исходного текста
-      if (!isValidDecryption(text)) {
-        console.error(
-          "Исходный шифротекст не может быть расшифрован с текущими настройками правой колонки!"
-        );
-        return;
-      }
-
+      if (!isValidDecryption(text)) { console.error("failed"); return; }
       let iterations = 0;
-      const maxSafetyCounter = 5000; // Предохранитель бесконечного цикла
-
+      const maxSafetyCounter = 5000;
       while (iterations < maxSafetyCounter) {
         iterations++;
-
-        // 1. Считаем частоту каждого символа в текущем успешном тексте
         const frequencies = {};
-        for (const char of text) {
-          frequencies[char] = (frequencies[char] || 0) + 1;
-        }
-
-        // 2. Находим экстремумы (максимальную и минимальную частоту)
+        for (const char of text) { frequencies[char] = (frequencies[char] || 0) + 1; }
         let maxCount = 0;
         let minCount = Infinity;
-
         for (const char in frequencies) {
           if (frequencies[char] > maxCount) maxCount = frequencies[char];
           if (frequencies[char] < minCount) minCount = frequencies[char];
         }
-
-        // КРИТЕРИЙ УСТОЙЧИВОСТИ: Идеальное распределение достигнуто (разница <= 1)
-        // Пример: если в тексте осталось распределение по 20 и 21 символу, цикл останавливается
         if (maxCount - minCount <= 1) {
-          console.log(
-            `Идеальное сбалансированное распределение достигнуто за ${iterations} итераций.`
-          );
-          break;
+          console.log(`passed in ${iterations} cycles`); break;
         }
-
-        // 3. Собираем списки кандидатов на перестановку
         const mostFrequentChars = [];
         const leastFrequentChars = [];
-
         for (const char in frequencies) {
           if (frequencies[char] === maxCount) mostFrequentChars.push(char);
           if (frequencies[char] === minCount) leastFrequentChars.push(char);
         }
-
-        // 4. Случайно выбираем один самый частый и один самый редкий символ из ранжирования
-        const targetChar =
-          mostFrequentChars[
-            Math.floor(Math.random() * mostFrequentChars.length)
-          ];
-        const replacement =
-          leastFrequentChars[
-            Math.floor(Math.random() * leastFrequentChars.length)
-          ];
-
+        const targetChar = mostFrequentChars[Math.floor(Math.random() * mostFrequentChars.length)];
+        const replacement = leastFrequentChars[Math.floor(Math.random() * leastFrequentChars.length)];
         if (targetChar === replacement) break;
-
-        // 5. Находим все индексы вхождений выбранного частого символа
         const indexes = [];
         for (let i = 0; i < text.length; i++) {
           if (text[i] === targetChar) {
             indexes.push(i);
           }
         }
-
-        // 6. Заменяем ровно одно случайное вхождение
         if (indexes.length > 0) {
-          const randomIndex =
-            indexes[Math.floor(Math.random() * indexes.length)];
-
-          const candidateText =
-            text.substring(0, randomIndex) +
-            replacement +
-            text.substring(randomIndex + 1);
-
-          // Проверяем устойчивость подстановки через тестовую дешифрацию
+          const randomIndex = indexes[Math.floor(Math.random() * indexes.length)];
+          const candidateText = text.substring(0, randomIndex) + replacement + text.substring(randomIndex + 1);
           if (isValidDecryption(candidateText)) {
-            text = candidateText; // Шаг успешен, фиксируем изменения строки
+            text = candidateText;
           } else {
-            // ОТКАТ: Если замена повредила внутренние блоки восстановления каналов,
-            // текущий candidateText отбрасывается, выполнение прерывается,
-            // а переменная `text` сохраняет полностью рабочий вид с предыдущего шага.
-            console.warn(
-              `Автоматический откат подстановки на итерации ${iterations}: мутация '${targetChar}' -> '${replacement}' нарушила целостность каналов.`
-            );
+            console.warn(`rollback on ${iterations}: as '${targetChar}' -> '${replacement}' failed the integrity check.`);
             break;
           }
         }
       }
-
-      // Записываем финальный устойчивый текст в интерфейс
       this.output1.value = text;
-
-      // Вызываем штатный дешифратор приложения для обновления правого текстового поля
       decrypt();
-
-      // 7. Обновляем левые графики (теперь они перерисуют ровную линию и симметричный круг)
       this.update_chart1(text);
       this.update_chart3(text);
     });
@@ -533,23 +378,12 @@ const ux = {
   },
 };
 
-function loadContent() {
+export function loadContent() {
   click(upload_json);
 }
 
 function saveContent() {
-  const blob = new Blob(
-    [
-      JSON.stringify({
-        cipher: output1.value,
-        sha: sha_plaintext1.value,
-        key: alphabet1.value,
-        shift: shift1.value,
-        iv: IV1.value,
-      }),
-    ],
-    { type: "application/json;charset=utf-8" }
-  );
+  const blob = new Blob([JSON.stringify({ cipher: output1.value, sha: sha_plaintext1.value, key: alphabet1.value, shift: shift1.value, iv: IV1.value })], { type: "application/json;charset=utf-8" });
   saveAs(blob, "settings.json");
 }
 
@@ -559,12 +393,8 @@ function load_(file) {
       const json = JSON.parse(content);
       plaintext2.value = json.cipher;
       sha_plaintext2.value = json.sha;
-      alphabet2.value = json.key
-        ? [...json.key].join("")
-        : [...default_alphabet].join("");
-      sha_2.value = json.key
-        ? sha1([...json.key])
-        : sha1([...default_alphabet]);
+      alphabet2.value = json.key ? [...json.key].join("") : [...default_alphabet].join("");
+      sha_2.value = json.key ? sha1([...json.key]) : sha1([...default_alphabet]);
       shift2.value = json.shift ? parseInt(json.shift, 10) : 1;
       IV2.value = json.iv ? parseInt(json.iv, 10) : 1;
       decrypt();
@@ -645,18 +475,6 @@ function setup_(isMain) {
     prepare2_();
     decrypt();
   }
-}
-
-function bytesToBase64(str) {
-  const bytes = new TextEncoder().encode(str);
-  const binString = String.fromCodePoint(...bytes);
-  return btoa(binString);
-}
-
-function base64ToBytes(base64) {
-  const binString = atob(base64);
-  const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0));
-  return new TextDecoder().decode(bytes);
 }
 
 export function ui() {

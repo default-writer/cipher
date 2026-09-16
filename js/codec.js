@@ -1,30 +1,4 @@
-import {
-  sha1,
-  random,
-  alphabet,
-  plaintext,
-  set_plaintext,
-  random_key,
-  encrypt_cipher,
-  decrypt_cipher,
-  default_key,
-  set_alphabet,
-} from "./cipher";
-
-function str2hex(str) {
-  const bytes = new TextEncoder().encode(str);
-  return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function hex2str(hex) {
-  const cleanHex = hex.replace(/\s+/g, "");
-  const bytes = new Uint8Array(
-    cleanHex.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
-  );
-  return new TextDecoder().decode(bytes);
-}
+import { sha1, encrypt_cipher, decrypt_cipher } from "./cipher";
 
 function encrypt_plain_(input, iv, shift, alphabet, sha) {
   const result = encrypt_cipher(
@@ -260,27 +234,7 @@ function decrypt_(input, iv, shift, alphabet, sha) {
   return result;
 }
 
-function update_chart1_(array) {
-  update_chart1(array);
-}
-
-function update_chart2_(array) {
-  update_chart2(array);
-}
-
-function update_chart3_(array) {
-  update_chart3(array);
-}
-
-function update_chart4_(array) {
-  update_chart4(array);
-}
-
 const chipher = {
-  selector: function (selector) {
-    this._encrypt = selector(encrypt_, encrypt_plain_);
-    this._decrypt = selector(decrypt_, decrypt_plain_);
-  },
   encrypt_plain: function (input, iv, shift, alphabet, sha) {
     return encrypt_plain_(input, iv, shift, alphabet, sha);
   },
@@ -288,10 +242,10 @@ const chipher = {
     return decrypt_plain_(input, iv, shift, alphabet, sha);
   },
   encrypt: function (input, iv, shift, alphabet, sha) {
-    return this._encrypt(input, iv, shift, alphabet, sha);
+    return encrypt_(input, iv, shift, alphabet, sha);
   },
   decrypt: function (input, iv, shift, alphabet, sha) {
-    return this._decrypt(input, iv, shift, alphabet, sha);
+    return decrypt_(input, iv, shift, alphabet, sha);
   },
 };
 
