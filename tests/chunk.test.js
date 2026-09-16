@@ -1,13 +1,13 @@
 import { TextEncoder, TextDecoder } from 'node:util';
 
-/**
+/*
  * function to calculate fixed chunk length for a single byte 0-255
  */
 function getChunkLength(alphabetLength) {
     return Math.ceil(Math.log(256) / Math.log(alphabetLength));
 }
 
-/**
+/*
  * encoding: any unicode text -> string of alphabet characters
  */
 function encodeToCustomAlphabet(plaintext, alphabetString) {
@@ -28,7 +28,7 @@ function encodeToCustomAlphabet(plaintext, alphabetString) {
     return result;
 }
 
-/**
+/*
  * decoding: string of alphabet characters -> original text
  */
 function decodeFromCustomAlphabet(encodedText, alphabetString) {
