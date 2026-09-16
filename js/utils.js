@@ -1,3 +1,5 @@
+import { TextEncoder, TextDecoder } from 'node:util';
+
 export function str2hex(str) {
     const bytes = new TextEncoder().encode(str);
     return Array.from(bytes)
