@@ -45,16 +45,6 @@ export function str_hmac_sha1(key, data) {
 }
 
 /*
- * Perform a simple self-test to see if the VM is working
- */
-export function validate_hex_sha1() {
-  return (
-    binb2hex(hex2binb(hex_sha1("abc"))) ===
-    "a9993e364706816aba3e25717850c26c9cd0d89d"
-  );
-}
-
-/*
  * Calculate the SHA-1 of an array of big-endian words, and a bit length
  */
 export function core_sha1(x, len) {
@@ -117,10 +107,10 @@ function sha1_kt(t) {
   return t < 20
     ? 1518500249
     : t < 40
-    ? 1859775393
-    : t < 60
-    ? -1894007588
-    : -899497514;
+      ? 1859775393
+      : t < 60
+        ? -1894007588
+        : -899497514;
 }
 
 /*
