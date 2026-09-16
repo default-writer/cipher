@@ -93,29 +93,26 @@ textarea {
   height: 80px;
 }
 
-/* Контейнер-родитель, который выстраивает левую и правую колонки в ряд */
 .parent-container {
-  display: flex !important; /* Принудительно включаем flex */
+  display: flex !important;
   width: 100%;
   gap: 20px;
   box-sizing: border-box;
   padding: 0 10px;
 }
 
-/* Стили для колонок */
 .column {
-  flex: 1 !important; /* Распределяет ширину 50% на 50% */
+  flex: 1 !important;
   width: 50% !important;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Стили для контейнера графиков — это заставит Chart.js растянуться */
 .chart-container {
   position: relative;
   width: 100% !important;
-  height: 320px !important; /* Укажите точную высоту графиков в пикселях */
+  height: 320px !important;
   margin-bottom: 20px;
   padding: 0;
 }
@@ -228,26 +225,23 @@ textarea:focus-within::-webkit-scrollbar-thumb {
   border-radius: 2px;
 }
 
-/* Принудительно сбрасываем баг глобального селектора div для графиков */
 td div.chart-container {
   display: block !important;
   width: 100% !important;
-  height: 380px !important; /* Увеличьте эту цифру, если хотите сделать графики еще выше */
+  height: 380px !important;
   position: relative !important;
   margin: 0 !important;
   padding: 0 !important;
   box-sizing: border-box !important;
 }
 
-/* Растягиваем холст Chart.js внутри контейнера */
 td div.chart-container canvas {
   width: 100% !important;
   height: 100% !important;
 }
 
-/* Заставляем таблицу не сжимать ячейки с графиками */
 table {
-  table-layout: fixed; /* Гарантирует строгое деление 50/50 */
+  table-layout: fixed;
   width: 100%;
 }
 
