@@ -187,7 +187,7 @@ const ux = {
         try {
           const safeCipherText = [...candidateText];
           const alphabetArray = this.alphabet1.value ? [...this.alphabet1.value] : [];
-          const decryptedResult = decode(chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value), [...default_alphabet]);
+          const decryptedResult = decode(chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value));
           const decryptedString = decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
@@ -387,7 +387,7 @@ function prepare2_() {
 
 function encrypt() {
   var result = chipher.encrypt(
-    encode(ux.plaintext1.value, [...default_alphabet]),
+    encode(ux.plaintext1.value),
     ux.IV1.value,
     ux.shift1.value,
     ux.alphabet1.value,
@@ -405,7 +405,7 @@ function decrypt() {
     ux.shift2.value,
     ux.alphabet2.value,
     ux.sha_2.value
-  ), [...default_alphabet]);
+  ));
   ux.output2.value = result;
   ux.update_chart2(result);
   ux.update_chart4(result);

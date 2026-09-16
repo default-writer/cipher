@@ -1,3 +1,5 @@
+import { default_alphabet } from "./alphabet";
+
 let encoder_;
 let decoder_;
 
@@ -14,8 +16,11 @@ function decoder() {
 /*
  * encoding: any unicode text -> string of alphabet characters
  */
-export function encode(plaintext, alphabetString) {
-    const base = alphabetString.length;
+export function encode(plaintext, alphabet) {
+    if (!!alphabet) {
+        alphabet = [...default_alphabet];
+    }
+    const base = alphabet.length;
     const chunkLen = Math.ceil(Math.log(256) / Math.log(base));
     const bytes = encoder().encode(plaintext);
     let result = [];
@@ -24,7 +29,7 @@ export function encode(plaintext, alphabetString) {
         let chunk = [];
         for (let j = 0; j < chunkLen; j++) {
             const remainder = value % base;
-            chunk = [...alphabetString[remainder], ...chunk];
+            chunk = [...alphabet[remainder], ...chunk];
             value = Math.floor(value / base);
         }
         result = [...result, ...chunk];
@@ -35,8 +40,11 @@ export function encode(plaintext, alphabetString) {
 /*
  * decoding: string of alphabet characters -> original text
  */
-export function decode(encodedText, alphabetString) {
-    const base = alphabetString.length;
+export function decode(encodedText, alphabet) {
+    if (!!alphabet) {
+        alphabet = [...default_alphabet];
+    }
+    const base = alphabet.length;
     const chunkLen = Math.ceil(Math.log(256) / Math.log(base));
 
     if (encodedText.length % chunkLen !== 0) {
@@ -50,7 +58,7 @@ export function decode(encodedText, alphabetString) {
         let value = 0;
         for (let j = 0; j < chunkLen; j++) {
             const char = encodedText[i + j];
-            const charIndex = alphabetString.indexOf(char);
+            const charIndex = alphabet.indexOf(char);
             if (charIndex === -1) throw new Error(`character ${char} not found in the alphabet!`);
             value = value * base + charIndex;
         }
