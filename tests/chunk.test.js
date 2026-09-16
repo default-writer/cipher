@@ -55,7 +55,7 @@ function decodeFromCustomAlphabet(encodedText, alphabetString) {
     return new TextDecoder().decode(bytes);
 }
 
-test("validate string to sha1 conversion", () => {
+test("test: encode and decode test", () => {
     const text = `The atmosphere of Mars is about 100 times thinner than Earth's, and it is 95 percent carbon dioxide.`;
 
     const binAlphabet = "01";
