@@ -13,11 +13,14 @@ function decoder() {
     return decoder_;
 }
 
+const bin_alphabet = "01";
+
+//const std_alphabet = [...default_alphabet]
 /*
  * encoding: any unicode text -> string of alphabet characters
  */
 export function encode(plaintext, alphabet) {
-    if (!!alphabet) {
+    if (!!!alphabet) {
         alphabet = [...default_alphabet];
     }
     const base = alphabet.length;
@@ -41,7 +44,7 @@ export function encode(plaintext, alphabet) {
  * decoding: string of alphabet characters -> original text
  */
 export function decode(encodedText, alphabet) {
-    if (!!alphabet) {
+    if (!!!alphabet) {
         alphabet = [...default_alphabet];
     }
     const base = alphabet.length;
