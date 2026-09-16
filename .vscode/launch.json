@@ -16,6 +16,23 @@
                 "--no-warnings",
                 "--experimental-vm-modules"
             ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "vite debug (browser + node)",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "console": "integratedTerminal",
+            "serverReadyAction": {
+                "pattern": "local:.*(http://localhost:\\d+)",
+                "uriFormat": "%s",
+                "action": "debugWithEdge", // Можно заменить на "debugWithChrome", если предпочитаете Chrome
+                "webRoot": "${workspaceFolder}"
+            }
         }
     ]
 }
