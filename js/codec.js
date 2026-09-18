@@ -1,6 +1,4 @@
 import { sha1, encrypt_cipher, decrypt_cipher } from "./cipher";
-import { default_alphabet } from "./alphabet";
-import { encode, decode } from "./utils";
 
 function encrypt_plain_(input, iv, shift, alphabet, sha) {
   const result = [...encrypt_cipher(
@@ -68,7 +66,7 @@ function encrypt_(input, iv, shift, alphabet, sha) {
     sha,
     sha1([String(...iv)])
   )];
-  return [...str1, ...str2, ...str3, ...str4, ...str5].join("");
+  return [...str1, ...str2, ...str3, ...str4, ...str5];
 }
 
 function decrypt_(input, iv, shift, alphabet, sha) {

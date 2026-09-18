@@ -1,19 +1,13 @@
 import { Chart } from "chart.js/auto";
 import { encode, decode } from "../js/utils";
+import { default_alphabet, default_plaintext } from "../js/common";
+import { random_alphabet, random_value } from "../js/cipher";
 
 import {
-  sha1,
-  random,
-  alphabet,
-  plaintext,
-  set_plaintext,
-  random_key,
-  default_key,
-  set_alphabet,
+  sha1
 } from "./cipher";
 import { chipher } from "./codec";
 import { click, saveAs } from "./io";
-import { default_alphabet } from "./alphabet";
 import { update_chart } from "./charts";
 
 const ux = {
@@ -185,7 +179,8 @@ const ux = {
         try {
           const safeCipherText = [...candidateText];
           const alphabetArray = this.alphabet1.value ? [...this.alphabet1.value] : [];
-          const decryptedResult = decode(chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value), alphabetArray);
+          //const decryptedResult = decode(chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value), alphabetArray);
+          const decryptedResult = chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray, this.sha_1.value);
           const decryptedString = decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
@@ -253,39 +248,42 @@ const ux = {
     });
     alphabet1.addEventListener("input", (event) => {
       event.preventDefault();
-      this.sha_1.value = sha1(alphabet);
+      this.sha_1.value = sha1([...alphabet1.value]);
       encrypt();
     });
     plaintext1.addEventListener("input", (event) => {
       event.preventDefault();
-      set_plaintext(plaintext1.value);
-      this.sha_plaintext1.value = sha1(plaintext);
+      this.sha_plaintext1.value = sha1(default_plaintext);
       encrypt();
     });
     randomize.addEventListener("click", (event) => {
       event.preventDefault();
-      this.IV1.value = random();
+      this.IV1.value = random_value();
       encrypt();
     });
     alphabet_default.addEventListener("click", (event) => {
       event.preventDefault();
-      setup_();
+      var plaintext = default_plaintext;
+      var alphabet = default_alphabet;
+      this.alphabet1.value = alphabet.join("");
+      this.sha_1.value = sha1(alphabet);
+      this.plaintext1.value = plaintext;
+      this.sha_plaintext1.value = sha1(plaintext);
+      encrypt();
     });
     alphabet_basic.addEventListener("click", (event) => {
       event.preventDefault();
-      set_alphabet(
-        "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n"
-      );
-      set_plaintext("This is a text.");
-      this.alphabet1.value = alphabet.join("");
+      var plaintext = "This is a text.";
+      var alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n";
+      this.alphabet1.value = alphabet;
       this.sha_1.value = sha1(alphabet);
-      this.plaintext1.value = plaintext.join("");
+      this.plaintext1.value = plaintext;
       this.sha_plaintext1.value = sha1(plaintext);
       encrypt();
     });
     this.alphabet_random.addEventListener("click", (event) => {
       event.preventDefault();
-      random_key();
+      var alphabet = random_alphabet(this.alphabet1.value);
       this.alphabet1.value = alphabet.join("");
       this.sha_1.value = sha1(alphabet);
       encrypt();
@@ -353,16 +351,16 @@ function read(file) {
 }
 
 function init_() {
-  default_key();
-  alphabet1.value = alphabet.join("");
-  plaintext1.value = plaintext.join("");
-  sha_1.value = sha1(alphabet);
-  sha_plaintext1.value = sha1(plaintext);
+  alphabet1.value = default_alphabet.join("");
+  plaintext1.value = default_plaintext;
+  sha_1.value = sha1(default_alphabet.join(""));
+  sha_plaintext1.value = sha1(default_plaintext);
   IV1.value = 1;
   shift1.value = 1;
   IV2.value = 1;
   shift2.value = 1;
-  plaintext2.value = plaintext.value;
+  plaintext2.value = null;
+  output2.value = null;
 }
 
 function prepare1_() {
@@ -381,46 +379,31 @@ function prepare2_() {
   plaintext2.value = output1.value;
   sha_2.value = sha_1.value;
   sha_plaintext2.value = sha_plaintext1.value;
+  output2.value = null;
 }
 
 function encrypt() {
-  var result = chipher.encrypt(
-    encode(ux.plaintext1.value, ux.alphabet1.value),
-    ux.IV1.value,
-    ux.shift1.value,
-    ux.alphabet1.value,
-    ux.sha_1.value
-  );
-  ux.output1.value = result;
+  //var result = chipher.encrypt(encode(ux.plaintext1.value, ux.alphabet1.value), ux.IV1.value, ux.shift1.value, ux.alphabet1.value, ux.sha_1.value);
+  var result = chipher.encrypt(ux.plaintext1.value, ux.IV1.value, ux.shift1.value, ux.alphabet1.value, ux.sha_1.value);
+  ux.output1.value = result.join("");
   ux.update_chart1(result);
   ux.update_chart3(result);
 }
 
 function decrypt() {
-  var result = decode(chipher.decrypt(
-    ux.plaintext2.value,
-    ux.IV2.value,
-    ux.shift2.value,
-    ux.alphabet2.value,
-    ux.sha_2.value
-  ), ux.alphabet2.value);
+  //var result = decode(chipher.decrypt(ux.plaintext2.value, ux.IV2.value, ux.shift2.value, ux.alphabet2.value, ux.sha_2.value), ux.alphabet2.value);
+  var result = chipher.decrypt(ux.plaintext2.value, ux.IV2.value, ux.shift2.value, ux.alphabet2.value, ux.sha_2.value);
   ux.output2.value = result;
   ux.update_chart2(result);
   ux.update_chart4(result);
 }
 
-function setup_(isMain) {
-  if (isMain === true) {
-    init_();
-    encrypt();
-    prepare2_();
-    decrypt();
-  }
-}
-
 export function ui() {
   ux.init();
-  setup_(true);
+  init_();
+  encrypt();
+  prepare2_();
+  decrypt();
 }
 
 export { ux };

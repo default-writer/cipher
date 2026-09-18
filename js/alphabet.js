@@ -1,7 +1,3 @@
-export const default_alphabet = [
-  ..."123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-];
-
 function sort(array) {
   return array.sort(function (a, b) {
     var firstLetter = a[0],

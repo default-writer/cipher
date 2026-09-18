@@ -1,4 +1,4 @@
-import { default_alphabet } from "./alphabet";
+import { default_alphabet } from "./common";
 
 let encoder_;
 let decoder_;
@@ -12,60 +12,71 @@ function decoder() {
     if (!decoder_) decoder_ = new TextDecoder();
     return decoder_;
 }
-
 const bin_alphabet = "01";
 
-//const std_alphabet = [...default_alphabet]
 /*
  * encoding: any unicode text -> string of alphabet characters
  */
 export function encode(plaintext, alphabet) {
-    if (!!!alphabet) {
+    if (!alphabet) {
         alphabet = [...default_alphabet];
     }
-    const base = alphabet.length;
-    const chunkLen = Math.ceil(Math.log(256) / Math.log(base));
-    const bytes = encoder().encode(plaintext);
-    let result = [];
+
+    const bytes = new TextEncoder("utf-8").encode(plaintext);
+
+    let hex = "";
     for (let i = 0; i < bytes.length; i++) {
-        let value = bytes[i];
-        let chunk = [];
-        for (let j = 0; j < chunkLen; j++) {
-            const remainder = value % base;
-            chunk = [...alphabet[remainder], ...chunk];
-            value = Math.floor(value / base);
-        }
-        result = [...result, ...chunk];
+        hex += bytes[i].toString(16).padStart(2, '0');
     }
+
+    if (!hex) return "";
+
+    let bigIntValue = BigInt("0x" + hex);
+    const base = BigInt(alphabet.length);
+    let result = "";
+
+        while (bigIntValue > 0n) {
+            const remainder = Number(bigIntValue % base);
+        result = alphabet[remainder] + result;
+            bigIntValue = bigIntValue / base;
+        }
+
+    for (let i = 0; i < bytes.length && bytes[i] === 0; i++) {
+        result = alphabet[0] + result;
+    }
+
     return result;
 }
 
-/*
- * decoding: string of alphabet characters -> original text
- */
 export function decode(encodedText, alphabet) {
-    if (!!!alphabet) {
+    if (!alphabet) {
         alphabet = [...default_alphabet];
     }
-    const base = alphabet.length;
-    const chunkLen = Math.ceil(Math.log(256) / Math.log(base));
 
-    if (encodedText.length % chunkLen !== 0) {
-        throw new Error("invalid encoded string length");
-    }
+    const base = BigInt(alphabet.length);
+        let bigIntValue = 0n;
 
-    const bytes = new Uint8Array(encodedText.length / chunkLen);
-    let byteIndex = 0;
-
-    for (let i = 0; i < encodedText.length; i += chunkLen) {
-        let value = 0;
-        for (let j = 0; j < chunkLen; j++) {
-            const char = encodedText[i + j];
+    for (let i = 0; i < encodedText.length; i++) {
+        const char = encodedText[i];
             const charIndex = alphabet.indexOf(char);
-            if (charIndex === -1) throw new Error(`character ${char} not found in the alphabet!`);
-            value = value * base + charIndex;
+            if (charIndex === -1) {
+                throw new Error(`Character ${char} not found in the alphabet!`);
+            }
+            bigIntValue = bigIntValue * base + BigInt(charIndex);
         }
-        bytes[byteIndex++] = value;
+
+        let hex = bigIntValue.toString(16);
+
+        if (hex.length % 2 !== 0) {
+            hex = '0' + hex;
+        }
+
+        const len = hex.length / 2;
+    const bytes = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+        bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
     }
-    return decoder().decode(bytes);
+
+    return new TextDecoder("utf-8").decode(bytes);
 }

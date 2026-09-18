@@ -1,4 +1,4 @@
-const default_plaintext = `🍎🍏 The atmosphere of Mars is about 100 times thinner than Earth's, and it is 95 percent carbon dioxide. Here's a breakdown of its composition, according to a NASA fact sheet:
+const default_plaintext = `The atmosphere of Mars is about 100 times thinner than Earth's, and it is 95 percent carbon dioxide. Here's a breakdown of its composition, according to a NASA fact sheet:
 
 Carbon dioxide: 95.32 percent
 Nitrogen: 2.7 percent
@@ -11,4 +11,13 @@ const seed = 1238473661;
 const max = 2147483647;
 const min = 0;
 
-export { seed, min, max, default_plaintext };
+// const default_alphabet = [
+//   ..."123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+// ];
+
+const default_alphabet = [
+  ..."~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:\"ZXCVBNM<>?`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./ ",
+  "\n"
+];
+
+export { seed, min, max, default_plaintext, default_alphabet };
