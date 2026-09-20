@@ -5,51 +5,67 @@ describe("recover tests", () => {
   const plaintext = "NASA_MARS";
   const iv = "58216150";
   const shift = 1;
-  const alphabet = "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+  const alphabet =
+    "abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   const sha = "b539474cb934ef";
 
   test("test: 0% errors on 5 channel(s)", () => {
-    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
-    const restoredText = chipher.decrypt(cipherText, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
+    const restoredText = chipher.decrypt(cipherText, iv, shift, alphabet);
     expect(restoredText).toBe(plaintext);
   });
   test("test: encrypt_plain and decrypt_plain", () => {
-    const cipherText = chipher.encrypt_plain(plaintext, iv, shift, alphabet, sha);
-    const restoredText = chipher.decrypt_plain(cipherText, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt_plain(plaintext, iv, shift, alphabet);
+    const restoredText = chipher.decrypt_plain(cipherText, iv, shift, alphabet);
     expect([...restoredText].join("")).toBe(plaintext);
   });
   test("test: decode and encode", () => {
-    const cipherText = chipher.encrypt(encode(plaintext, alphabet), iv, shift, alphabet, sha);
-    const restoredText = decode(chipher.decrypt(cipherText, iv, shift, alphabet, sha), alphabet);
+    const cipherText = chipher.encrypt(
+      encode(plaintext, alphabet),
+      iv,
+      shift,
+      alphabet,
+    );
+    const restoredText = decode(
+      chipher.decrypt(cipherText, iv, shift, alphabet),
+      alphabet,
+    );
     expect(restoredText).toBe(plaintext);
   });
   test("test: decode and encode default alphabet", () => {
-    const cipherText = chipher.encrypt(encode(plaintext), iv, shift, alphabet, sha);
-    const restoredText = decode(chipher.decrypt(cipherText, iv, shift, alphabet, sha));
+    const cipherText = encode(plaintext);
+    const restoredText = decode(cipherText);
     expect(restoredText).toBe(plaintext);
   });
   test("test: 100% errors on 1 channel(s)", () => {
-    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
     const partLength = Math.floor(cipherText.length / 5);
-    const brokenCipherText = [..."X".repeat(partLength), ...cipherText.slice(partLength)];
+    const brokenCipherText = [
+      ..."X".repeat(partLength),
+      ...cipherText.slice(partLength),
+    ];
 
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
     expect(restoredText).toBe(plaintext);
   });
 
   test("test: 100% errors on 2 channel(s)", () => {
-    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
     const partLength = Math.floor(cipherText.length / 5);
     const badStream = "X".repeat(partLength);
-    const brokenCipherText = [...badStream, ...badStream, ...cipherText.slice(partLength * 2)];
+    const brokenCipherText = [
+      ...badStream,
+      ...badStream,
+      ...cipherText.slice(partLength * 2),
+    ];
 
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
 
     expect([plaintext, "X".repeat(plaintext.length)]).toContain(restoredText);
   });
 
   test("test: 100% errors on 1 random channel(s)", () => {
-    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
     const partLength = Math.floor(cipherText.length / 5);
 
     let channels = [
@@ -74,13 +90,13 @@ describe("recover tests", () => {
     console.table(visualMatrix);
 
     const brokenCipherText = channels.flatMap((ch) => ch);
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
 
     expect(restoredText).toBe(plaintext);
   });
 
   test("test: 100% errors on 2 random channel(s)", () => {
-    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet, sha);
+    const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
     const partLength = Math.floor(cipherText.length / 5);
 
     let channels = [
@@ -101,14 +117,16 @@ describe("recover tests", () => {
       channels[randomChannelIdx1][i] = badChar1;
       channels[randomChannelIdx2][i] = badChar2;
       for (let c = 0; c < 5; c++) {
-        visualMatrix[c].push(c === randomChannelIdx1 || c === randomChannelIdx2 ? "x" : "o");
+        visualMatrix[c].push(
+          c === randomChannelIdx1 || c === randomChannelIdx2 ? "x" : "o",
+        );
       }
     }
 
     console.table(visualMatrix);
 
     const brokenCipherText = channels.flatMap((ch) => ch);
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet, sha);
+    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
 
     expect(restoredText).toBe(plaintext);
   });
