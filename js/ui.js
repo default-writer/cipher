@@ -182,7 +182,7 @@ const ux = {
     });
     this.convert1.addEventListener("click", (event) => {
       event.preventDefault();
-      let text = this.output1.value;
+      let text = [...this.output1.value];
       if (!text || text.length === 0) return;
       const originalPlaintext = this.plaintext1.value;
       const isValidDecryption = (candidateText) => {
@@ -257,7 +257,7 @@ const ux = {
             ...text.slice(randomIndex + 1),
           ];
           if (isValidDecryption(candidateText)) {
-            text = candidateText;
+            text = [...candidateText];
           } else {
             console.warn(
               `rollback on ${iterations}: as '${targetChar}' -> '${replacement}' failed the integrity check.`,
