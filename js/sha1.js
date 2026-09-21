@@ -51,27 +51,24 @@ export function core_sha1(x, len) {
   /* append padding */
   x[len >> 5] |= 0x80 << (24 - (len % 32));
   x[(((len + 64) >> 9) << 4) + 15] = len;
-
   var w = Array(80);
   var a = 1732584193;
   var b = -271733879;
   var c = -1732584194;
   var d = 271733878;
   var e = -1009589776;
-
   for (var i = 0; i < x.length; i += 16) {
     var olda = a;
     var oldb = b;
     var oldc = c;
     var oldd = d;
     var olde = e;
-
     for (var j = 0; j < 80; j++) {
       if (j < 16) w[j] = x[i + j];
       else w[j] = rol(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
       var t = safe_add(
         safe_add(rol(a, 5), sha1_ft(j, b, c, d)),
-        safe_add(safe_add(e, w[j]), sha1_kt(j))
+        safe_add(safe_add(e, w[j]), sha1_kt(j)),
       );
       e = d;
       d = c;
@@ -79,7 +76,6 @@ export function core_sha1(x, len) {
       b = a;
       a = t;
     }
-
     a = safe_add(a, olda);
     b = safe_add(b, oldb);
     c = safe_add(c, oldc);
@@ -119,14 +115,12 @@ function sha1_kt(t) {
 export function core_hmac_sha1(key, data) {
   var bkey = str2binb(key);
   if (bkey.length > 16) bkey = core_sha1(bkey, key.length * chrsz);
-
   var ipad = Array(16),
     opad = Array(16);
   for (var i = 0; i < 16; i++) {
     ipad[i] = bkey[i] ^ 0x36363636;
     opad[i] = bkey[i] ^ 0x5c5c5c5c;
   }
-
   var hash = core_sha1(ipad.concat(str2binb(data)), 512 + data.length * chrsz);
   return core_sha1(opad.concat(hash), 512 + 160);
 }
@@ -181,7 +175,7 @@ export function binb2str(bin) {
   var mask = (1 << chrsz) - 1;
   for (var i = 0; i < bin.length * 32; i += chrsz)
     str += String.fromCharCode(
-      (bin[i >> 5] >>> (32 - chrsz - (i % 32))) & mask
+      (bin[i >> 5] >>> (32 - chrsz - (i % 32))) & mask,
     );
   return str;
 }

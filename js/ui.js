@@ -15,7 +15,6 @@ const ux = {
   output1: document.getElementById("output1"),
   convert1: document.getElementById("convert1"),
   sha_plaintext1: document.getElementById("sha_plaintext1"),
-
   shift1: document.getElementById("shift1"),
   import_json: document.getElementById("import_json"),
   export_json: document.getElementById("export_json"),
@@ -26,7 +25,6 @@ const ux = {
   IV2: document.getElementById("IV2"),
   output2: document.getElementById("output2"),
   sha_plaintext2: document.getElementById("sha_plaintext2"),
-
   shift2: document.getElementById("shift2"),
   app1: document.getElementById("app1"),
   app2: document.getElementById("app2"),
@@ -191,7 +189,6 @@ const ux = {
           const alphabetArray = this.alphabet1.value
             ? [...this.alphabet1.value]
             : [];
-
           const decryptedResult = chipher.decrypt(
             safeCipherText,
             this.IV1.value,
@@ -284,7 +281,6 @@ const ux = {
     });
     alphabet1.addEventListener("input", (event) => {
       event.preventDefault();
-
       encrypt();
     });
     plaintext1.addEventListener("input", (event) => {
@@ -302,7 +298,6 @@ const ux = {
       var plaintext = default_plaintext;
       var alphabet = default_alphabet;
       this.alphabet1.value = alphabet.join("");
-
       this.plaintext1.value = plaintext;
       this.sha_plaintext1.value = sha1(plaintext);
       encrypt();
@@ -313,7 +308,6 @@ const ux = {
       var alphabet =
         "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n";
       this.alphabet1.value = alphabet;
-
       this.plaintext1.value = plaintext;
       this.sha_plaintext1.value = sha1(plaintext);
       encrypt();
@@ -322,7 +316,6 @@ const ux = {
       event.preventDefault();
       var alphabet = random_alphabet([...this.alphabet1.value]);
       this.alphabet1.value = alphabet.join("");
-
       encrypt();
     });
     this.shift1.addEventListener("change", (event) => {
@@ -337,7 +330,6 @@ const ux = {
       event.preventDefault();
       decrypt();
     });
-
     this.sha_plaintext1.readOnly = true;
   },
   update_chart1: function (array) {
@@ -363,7 +355,6 @@ function load_(file) {
       alphabet2.value = json.key
         ? [...json.key].join("")
         : [...default_alphabet].join("");
-
       shift2.value = json.shift ? parseInt(json.shift, 10) : 1;
       IV2.value = json.iv ? parseInt(json.iv, 10) : 1;
       decrypt();
@@ -383,7 +374,6 @@ function read(file) {
 function init_() {
   alphabet1.value = default_alphabet.join("");
   plaintext1.value = default_plaintext;
-
   sha_plaintext1.value = sha1(default_plaintext);
   IV1.value = 1;
   shift1.value = 1;
@@ -398,7 +388,6 @@ function prepare1_() {
   shift1.value = shift2.value;
   alphabet1.value = alphabet2.value;
   plaintext1.value = output2.value;
-
   sha_plaintext1.value = sha_plaintext2.value;
 }
 
@@ -407,7 +396,6 @@ function prepare2_() {
   shift2.value = shift1.value;
   alphabet2.value = alphabet1.value;
   plaintext2.value = output1.value;
-
   sha_plaintext2.value = sha_plaintext1.value;
   output2.value = null;
 }
