@@ -1,24 +1,29 @@
 import { default_alphabet } from "./common";
 
-let encoder_;
-let decoder_;
+const te = new TextEncoder();
+const td = new TextDecoder();
 
-function encoder() {
-  if (!encoder_) encoder_ = new TextEncoder();
-  return encoder_;
-}
+/* ---------------------------- helpers ----------------------------- */
 
-function decoder() {
-  if (!decoder_) decoder_ = new TextDecoder();
-  return decoder_;
+export function toBytes(input) {
+  if (typeof input === "string") {
+    return te.encode(input); // UTF-8, same as WebCrypto
+  }
+  if (input instanceof Uint8Array) return input;
+  if (input instanceof ArrayBuffer) return new Uint8Array(input);
+  if (ArrayBuffer.isView(input))
+    return new Uint8Array(input.buffer, input.byteOffset, input.byteLength);
+  if (Array.isArray(input)) return Uint8Array.from(input);
+  throw new TypeError(
+    "Expected string, Uint8Array, ArrayBuffer or array of bytes",
+  );
 }
-const bin_alphabet = "01";
 
 export function encode(plaintext, alphabet) {
   if (!alphabet) {
     alphabet = [...default_alphabet];
   }
-  const bytes = new TextEncoder("utf-8").encode(plaintext);
+  const bytes = te.encode(plaintext);
   let hex = "";
   for (let i = 0; i < bytes.length; i++) {
     hex += bytes[i].toString(16).padStart(2, "0");
@@ -61,5 +66,5 @@ export function decode(encodedText, alphabet) {
   for (let i = 0; i < len; i++) {
     bytes[i] = parseInt(hex.substring(i * 2, i * 2 + 2), 16);
   }
-  return new TextDecoder("utf-8").decode(bytes);
+  return td.decode(bytes);
 }

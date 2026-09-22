@@ -1,6 +1,5 @@
-import { hex_sha1, hex2binb } from "./sha1";
 import { prng } from "./prng";
-import { default_alphabet, seed, min, max } from "./common";
+import { seed, min, max } from "./common";
 
 function shuffle(array, seed) {
   let rng = new prng(seed);
@@ -60,9 +59,6 @@ export function random_value() {
 }
 export function random_alphabet(alphabet) {
   return shuffle([...alphabet], random_value());
-}
-export function sha1(array) {
-  return hex_sha1(String(array));
 }
 export function decrypt_cipher(...args) {
   return cipher_function(shift_decrypt)(...args);

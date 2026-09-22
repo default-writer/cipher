@@ -1,12 +1,18 @@
 import { Chart } from "chart.js/auto";
-import { encode, decode } from "../js/utils";
+import { encode_base58, decode_base58 } from "../js/base58";
+import { bytesToHex } from "../js/sha256";
+
 import { default_alphabet, default_plaintext } from "../js/common";
 import { random_alphabet, random_value } from "../js/cipher";
 
-import { sha1 } from "./cipher";
+import { sha1 } from "./sha1";
 import { chipher } from "./codec";
 import { click, saveAs } from "./io";
 import { update_chart } from "./charts";
+
+const hex = (input) => bytesToHex(sha1(input));
+const te = new TextEncoder();
+const td = new TextDecoder();
 
 const ux = {
   alphabet1: document.getElementById("alphabet1"),
@@ -14,6 +20,7 @@ const ux = {
   IV1: document.getElementById("IV1"),
   output1: document.getElementById("output1"),
   convert1: document.getElementById("convert1"),
+  text1: document.getElementById("text1"),
   sha_plaintext1: document.getElementById("sha_plaintext1"),
   shift1: document.getElementById("shift1"),
   import_json: document.getElementById("import_json"),
@@ -24,6 +31,7 @@ const ux = {
   plaintext2: document.getElementById("plaintext2"),
   IV2: document.getElementById("IV2"),
   output2: document.getElementById("output2"),
+  text2: document.getElementById("text2"),
   sha_plaintext2: document.getElementById("sha_plaintext2"),
   shift2: document.getElementById("shift2"),
   app1: document.getElementById("app1"),
@@ -123,15 +131,25 @@ const ux = {
         },
       },
     );
-    this.output1.addEventListener("change", (event) => {
+    this.output1.addEventListener("input", (event) => {
       event.preventDefault();
       const text = this.output1.value;
+      try {
+        this.text1.value = encode_base58(te.encode(text));
+      } catch {
+        this.text1.value = "";
+      }
       this.update_chart1(text);
       this.update_chart3(text);
     });
-    this.output2.addEventListener("change", (event) => {
+    this.output2.addEventListener("input", (event) => {
       event.preventDefault();
       const text = this.output2.value;
+      try {
+        this.text2.value = td.decode(decode_base58(text));
+      } catch {
+        this.text2.value = "";
+      }
       this.update_chart2(text);
       this.update_chart4(text);
     });
@@ -189,12 +207,14 @@ const ux = {
           const alphabetArray = this.alphabet1.value
             ? [...this.alphabet1.value]
             : [];
-          const decryptedResult = chipher.decrypt(
-            safeCipherText,
-            this.IV1.value,
-            parseInt(this.shift1.value, 10) || 0,
-            alphabetArray,
-          );
+          const decryptedResult = chipher
+            .decrypt(
+              safeCipherText,
+              this.IV1.value,
+              parseInt(this.shift1.value, 10) || 0,
+              alphabetArray,
+            )
+            .join("");
           const decryptedString = decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
@@ -255,14 +275,11 @@ const ux = {
           ];
           if (isValidDecryption(candidateText)) {
             text = [...candidateText];
-          } else {
-            console.warn(
-              `rollback on ${iterations}: as '${targetChar}' -> '${replacement}' failed the integrity check.`,
-            );
           }
         }
       }
       this.output1.value = text.join("");
+      this.text1.value = encode_base58(te.encode(this.output1.value));
       decrypt();
       this.update_chart1(text);
       this.update_chart3(text);
@@ -285,7 +302,7 @@ const ux = {
     });
     plaintext1.addEventListener("input", (event) => {
       event.preventDefault();
-      this.sha_plaintext1.value = sha1(default_plaintext);
+      this.sha_plaintext1.value = hex(default_plaintext);
       encrypt();
     });
     randomize.addEventListener("click", (event) => {
@@ -299,7 +316,7 @@ const ux = {
       var alphabet = default_alphabet;
       this.alphabet1.value = alphabet.join("");
       this.plaintext1.value = plaintext;
-      this.sha_plaintext1.value = sha1(plaintext);
+      this.sha_plaintext1.value = hex(plaintext);
       encrypt();
     });
     alphabet_basic.addEventListener("click", (event) => {
@@ -309,7 +326,7 @@ const ux = {
         "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n";
       this.alphabet1.value = alphabet;
       this.plaintext1.value = plaintext;
-      this.sha_plaintext1.value = sha1(plaintext);
+      this.sha_plaintext1.value = hex(plaintext);
       encrypt();
     });
     this.alphabet_random.addEventListener("click", (event) => {
@@ -374,7 +391,7 @@ function read(file) {
 function init_() {
   alphabet1.value = default_alphabet.join("");
   plaintext1.value = default_plaintext;
-  sha_plaintext1.value = sha1(default_plaintext);
+  sha_plaintext1.value = hex(default_plaintext);
   IV1.value = 1;
   shift1.value = 1;
   IV2.value = 1;
@@ -388,7 +405,7 @@ function prepare1_() {
   shift1.value = shift2.value;
   alphabet1.value = alphabet2.value;
   plaintext1.value = output2.value;
-  sha_plaintext1.value = sha_plaintext2.value;
+  sha_plaintext1.value = hex(sha_plaintext2.value);
 }
 
 function prepare2_() {
@@ -401,27 +418,42 @@ function prepare2_() {
 }
 
 function encrypt() {
-  var result = chipher.encrypt(
-    ux.plaintext1.value,
-    ux.IV1.value,
-    ux.shift1.value,
-    ux.alphabet1.value,
-  );
-  ux.output1.value = result.join("");
-  ux.update_chart1(result);
-  ux.update_chart3(result);
+  try {
+    ux.output1.value = chipher
+      .encrypt(
+        ux.plaintext1.value,
+        ux.IV1.value,
+        ux.shift1.value,
+        ux.alphabet1.value,
+      )
+      .join("");
+    ux.text1.value = encode_base58(te.encode(ux.output1.value));
+  } catch (_ex) {
+    console.log(_ex);
+    ux.output1.value = "";
+  }
+  ux.update_chart1([...ux.output1.value]);
+  ux.update_chart3([...ux.output1.value]);
 }
 
 function decrypt() {
-  var result = chipher.decrypt(
-    ux.plaintext2.value,
-    ux.IV2.value,
-    ux.shift2.value,
-    ux.alphabet2.value,
-  );
-  ux.output2.value = result;
-  ux.update_chart2(result);
-  ux.update_chart4(result);
+  var input = "";
+  try {
+    ux.output2.value = chipher
+      .decrypt(
+        [...ux.plaintext2.value],
+        ux.IV2.value,
+        ux.shift2.value,
+        ux.alphabet2.value,
+      )
+      .join("");
+    ux.text2.value = td.decode(decode_base58(ux.text1.value));
+  } catch (_ex) {
+    console.log(_ex);
+    ux.output2.value = "";
+  }
+  ux.update_chart2([...ux.output2.value]);
+  ux.update_chart4([...ux.output2.value]);
 }
 
 export function ui() {

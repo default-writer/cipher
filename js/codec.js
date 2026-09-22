@@ -1,4 +1,4 @@
-import { sha1, encrypt_cipher, decrypt_cipher } from "./cipher";
+import { encrypt_cipher, decrypt_cipher } from "./cipher";
 
 function encrypt_plain_(input, iv, shift, alphabet) {
   const result = [
@@ -186,7 +186,7 @@ function decrypt_(input, iv, shift, alphabet) {
   const str3 = result3;
   const str4 = result4;
   const str5 = result5;
-  let result = "";
+  let result = [];
   for (let i = 0; i < partLength; i++) {
     const char1 = str1[i];
     const char2 = str2[i];
@@ -209,7 +209,7 @@ function decrypt_(input, iv, shift, alphabet) {
         }
       }
     }
-    result += winnerChar;
+    result.push(winnerChar);
   }
   return result;
 }

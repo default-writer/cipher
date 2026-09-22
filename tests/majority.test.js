@@ -10,7 +10,9 @@ describe("recover tests", () => {
   const sha = "b539474cb934ef";
   test("test: 0% errors on 5 channel(s)", () => {
     const cipherText = chipher.encrypt(plaintext, iv, shift, alphabet);
-    const restoredText = chipher.decrypt(cipherText, iv, shift, alphabet);
+    const restoredText = chipher
+      .decrypt(cipherText, iv, shift, alphabet)
+      .join("");
     expect(restoredText).toBe(plaintext);
   });
   test("test: encrypt_plain and decrypt_plain", () => {
@@ -43,7 +45,9 @@ describe("recover tests", () => {
       ..."X".repeat(partLength),
       ...cipherText.slice(partLength),
     ];
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
+    const restoredText = chipher
+      .decrypt(brokenCipherText, iv, shift, alphabet)
+      .join("");
     expect(restoredText).toBe(plaintext);
   });
   test("test: 100% errors on 2 channel(s)", () => {
@@ -55,7 +59,9 @@ describe("recover tests", () => {
       ...badStream,
       ...cipherText.slice(partLength * 2),
     ];
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
+    const restoredText = chipher
+      .decrypt(brokenCipherText, iv, shift, alphabet)
+      .join("");
     expect([plaintext, "X".repeat(plaintext.length)]).toContain(restoredText);
   });
   test("test: 100% errors on 1 random channel(s)", () => {
@@ -79,7 +85,9 @@ describe("recover tests", () => {
     }
     console.table(visualMatrix);
     const brokenCipherText = channels.flatMap((ch) => ch);
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
+    const restoredText = chipher
+      .decrypt(brokenCipherText, iv, shift, alphabet)
+      .join("");
     expect(restoredText).toBe(plaintext);
   });
   test("test: 100% errors on 2 random channel(s)", () => {
@@ -108,7 +116,9 @@ describe("recover tests", () => {
     }
     console.table(visualMatrix);
     const brokenCipherText = channels.flatMap((ch) => ch);
-    const restoredText = chipher.decrypt(brokenCipherText, iv, shift, alphabet);
+    const restoredText = chipher
+      .decrypt(brokenCipherText, iv, shift, alphabet)
+      .join("");
     expect(restoredText).toBe(plaintext);
   });
 });

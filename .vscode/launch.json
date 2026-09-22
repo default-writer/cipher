@@ -12,9 +12,9 @@
       "runtimeArgs": ["--no-warnings", "--experimental-vm-modules"]
     },
     {
+      "name": "vite debug",
       "type": "node",
       "request": "launch",
-      "name": "vite + chrome",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "console": "integratedTerminal",
@@ -23,7 +23,8 @@
         "pattern": "Local:\\s+(https?://\\S+)",
         "uriFormat": "%s",
         "action": "debugWithChrome",
-        "webRoot": "${workspaceFolder}/src"
+        "webRoot": "${workspaceFolder}",
+        "killOnServerStop": true
       }
     }
   ]
