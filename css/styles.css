@@ -9,7 +9,27 @@ body {
 
 body,
 textarea {
+  margin: 8px;
+  padding: 0px;
+  padding: 0;
+  margin: 0;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
   background: #ffffff;
+}
+
+#main {
+  transition: opacity 0.15s ease;
+  opacity: 0;
+}
+
+#main.active {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 canvas {
@@ -20,6 +40,8 @@ canvas {
 h1 {
   font-weight: 200;
   font-size: 16px;
+  padding-left: 2px;
+  padding-right: 2px;
   margin: 0;
 }
 
@@ -38,30 +60,6 @@ table {
 }
 td {
   width: 50%;
-}
-
-h1,
-h2,
-label,
-input,
-textarea,
-div {
-  padding-left: 2px;
-  padding-right: 2px;
-  margin-left: 2px;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  margin-right: 2px;
-  height: auto;
-}
-
-table,
-tr,
-td {
-  padding-right: 2px;
-  border-spacing: 2px;
-  margin-right: 2px;
-  padding-left: 2px;
 }
 
 input[type="button"],
@@ -124,10 +122,8 @@ textarea {
   width: calc(100% - 12px);
   padding-left: 2px;
   padding-right: 2px;
-  margin-left: 2px;
   margin-bottom: 5px;
   margin-top: 5px;
-  margin-right: 2px;
 }
 
 #alphabet1,
@@ -137,10 +133,6 @@ textarea {
   width: calc(100% - 10px);
   padding-left: 2px;
   padding-right: 2px;
-  margin-left: 2px;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  margin-right: 2px;
 }
 
 #shift1,
@@ -149,22 +141,105 @@ textarea {
   height: auto;
   padding-left: 2px;
   padding-right: 2px;
-  margin-left: 2px;
   margin-bottom: 5px;
   margin-top: 5px;
-  margin-right: 2px;
+}
+
+#root {
+  padding-left: 0px;
+  padding-right: 0px;
+  margin-left: 0px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  margin-right: 0px;
+  height: auto;
+}
+
+#view-2-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.close-btn {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.close-icon {
+  d: path(
+    "M5.29289 5.29289C5.68342 4.90237 6.31658 4.90237 6.70711 5.29289L12 10.5858L17.2929 5.29289C17.6834 4.90237 18.3166 4.90237 18.7071 5.29289C19.0976 5.68342 19.0976 6.31658 18.7071 6.70711L13.4142 12L18.7071 17.2929C19.0976 17.6834 19.0976 18.3166 18.7071 18.7071C18.3166 19.0976 17.6834 19.0976 17.2929 18.7071L12 13.4142L6.70711 18.7071C6.31658 19.0976 5.68342 19.0976 5.29289 18.7071C4.90237 18.3166 4.90237 17.6834 5.29289 17.2929L10.5858 12L5.29289 6.70711C4.90237 6.31658 4.90237 5.68342 5.29289 5.29289Z"
+  );
+  fill-rule: evenodd;
+  clip-rule: evenodd;
+  fill: #888888;
+  transition: fill 0.15s ease;
+}
+
+#view-2-close:hover .close-icon {
+  fill: #ff0000;
+}
+
+.close-btn:hover {
+  color: #ccc;
+  fill: #ccc;
+}
+
+.close-icon:hover {
+  fill: #ccc;
+}
+
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  color: white;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.fullscreen-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.view-2-content {
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-2-content table {
+  width: 100%;
+  height: 100%;
+  table-layout: fixed;
 }
 
 div {
   word-break: break-word;
-  width: 100%;
 }
 
 textarea {
-  -webkit-transition: all 0.1s ease;
-  -moz-transition: all 0.1s ease;
-  -o-transition: all 0.1s ease;
-  transition: all 0.1s ease;
+  -webkit-transition: all 0.15s ease;
+  -moz-transition: all 0.15s ease;
+  -o-transition: all 0.15s ease;
+  transition: all 0.15s ease;
   overflow-y: scroll;
   resize: none;
 }
@@ -191,7 +266,7 @@ textarea:focus-within::-webkit-scrollbar-thumb {
 td div.chart-container {
   display: block !important;
   width: 100% !important;
-  height: 380px !important;
+  height: 42vh !important;
   position: relative !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -201,6 +276,8 @@ td div.chart-container {
 td div.chart-container canvas {
   width: 100% !important;
   height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 table {

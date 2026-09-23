@@ -40,97 +40,101 @@ const ux = {
   alphabet_random: document.getElementById("alphabet_random"),
   alphabet_default: document.getElementById("alphabet_default"),
   alphabet_basic: document.getElementById("alphabet_basic"),
-  encrypt: document.getElementById("encrypt"),
-  decrypt: document.getElementById("decrypt"),
+  encrypt1: document.getElementById("encrypt"),
+  decrypt1: document.getElementById("decrypt"),
+  main: document.getElementById("main"),
+  view2Btn: document.getElementById("view-2-btn"),
+  view2Screen: document.getElementById("view-2-screen"),
+  closeview2: document.getElementById("view-2-close"),
   init: function () {
-    this.chart1 = new Chart(
-      document.getElementById("myChart1").getContext("2d"),
-      {
-        type: "doughnut",
-        data: [],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            arc: {
-              borderWidth: 1,
-              borderColor: "rgba(0,127,0,0.25)",
-            },
+    this.chart1 = new Chart(document.getElementById("myChart1").getContext("2d"), {
+      type: "doughnut",
+      data: [],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          arc: {
+            borderWidth: 1,
+            borderColor: "rgba(0,127,0,0.25)",
           },
-          plugins: {
-            legend: {
-              display: false,
-            },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            enabled: false,
           },
         },
       },
-    );
-    this.chart2 = new Chart(
-      document.getElementById("myChart2").getContext("2d"),
-      {
-        type: "doughnut",
-        data: [],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            arc: {
-              borderWidth: 1,
-              borderColor: "rgba(0,127,0,0.25)",
-            },
+    });
+    this.chart2 = new Chart(document.getElementById("myChart2").getContext("2d"), {
+      type: "doughnut",
+      data: [],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          arc: {
+            borderWidth: 1,
+            borderColor: "rgba(0,127,0,0.25)",
           },
-          plugins: {
-            legend: {
-              display: false,
-            },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            enabled: false,
           },
         },
       },
-    );
-    this.chart3 = new Chart(
-      document.getElementById("myChart3").getContext("2d"),
-      {
-        type: "line",
-        data: [],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            arc: {
-              borderWidth: 1,
-              borderColor: "rgba(0,127,0,0.25)",
-            },
+    });
+    this.chart3 = new Chart(document.getElementById("myChart3").getContext("2d"), {
+      type: "line",
+      data: [],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          arc: {
+            borderWidth: 1,
+            borderColor: "rgba(0,127,0,0.25)",
           },
-          plugins: {
-            legend: {
-              display: false,
-            },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            enabled: true,
           },
         },
       },
-    );
-    this.chart4 = new Chart(
-      document.getElementById("myChart4").getContext("2d"),
-      {
-        type: "line",
-        data: [],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          elements: {
-            arc: {
-              borderWidth: 1,
-              borderColor: "rgba(0,127,0,0.25)",
-            },
+    });
+    this.chart4 = new Chart(document.getElementById("myChart4").getContext("2d"), {
+      type: "line",
+      data: [],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        elements: {
+          arc: {
+            borderWidth: 1,
+            borderColor: "rgba(0,127,0,0.25)",
           },
-          plugins: {
-            legend: {
-              display: false,
-            },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            enabled: true,
           },
         },
       },
-    );
+    });
     this.output1.addEventListener("input", (event) => {
       event.preventDefault();
       const text = this.output1.value;
@@ -204,17 +208,8 @@ const ux = {
       const isValidDecryption = (candidateText) => {
         try {
           const safeCipherText = [...candidateText];
-          const alphabetArray = this.alphabet1.value
-            ? [...this.alphabet1.value]
-            : [];
-          const decryptedResult = chipher
-            .decrypt(
-              safeCipherText,
-              this.IV1.value,
-              parseInt(this.shift1.value, 10) || 0,
-              alphabetArray,
-            )
-            .join("");
+          const alphabetArray = this.alphabet1.value ? [...this.alphabet1.value] : [];
+          const decryptedResult = chipher.decrypt(safeCipherText, this.IV1.value, parseInt(this.shift1.value, 10) || 0, alphabetArray).join("");
           const decryptedString = decryptedResult;
           return decryptedString === originalPlaintext;
         } catch (e) {
@@ -250,14 +245,8 @@ const ux = {
           if (frequencies[char] === maxCount) mostFrequentChars.push(char);
           if (frequencies[char] === minCount) leastFrequentChars.push(char);
         }
-        const targetChar =
-          mostFrequentChars[
-            Math.floor(Math.random() * mostFrequentChars.length)
-          ];
-        const replacement =
-          leastFrequentChars[
-            Math.floor(Math.random() * leastFrequentChars.length)
-          ];
+        const targetChar = mostFrequentChars[Math.floor(Math.random() * mostFrequentChars.length)];
+        const replacement = leastFrequentChars[Math.floor(Math.random() * leastFrequentChars.length)];
         if (targetChar === replacement) break;
         const indexes = [];
         for (let i = 0; i < text.length; i++) {
@@ -266,13 +255,8 @@ const ux = {
           }
         }
         if (indexes.length > 0) {
-          const randomIndex =
-            indexes[Math.floor(Math.random() * indexes.length)];
-          const candidateText = [
-            ...text.slice(0, randomIndex),
-            ...replacement,
-            ...text.slice(randomIndex + 1),
-          ];
+          const randomIndex = indexes[Math.floor(Math.random() * indexes.length)];
+          const candidateText = [...text.slice(0, randomIndex), ...replacement, ...text.slice(randomIndex + 1)];
           if (isValidDecryption(candidateText)) {
             text = [...candidateText];
           }
@@ -280,74 +264,109 @@ const ux = {
       }
       this.output1.value = text.join("");
       this.text1.value = encode_base58(te.encode(this.output1.value));
-      decrypt();
+      this.decrypt();
       this.update_chart1(text);
       this.update_chart3(text);
     });
-    app1.addEventListener("click", (event) => {
-      event.preventDefault();
-      prepare2_();
+    this.view2Btn.addEventListener("click", () => {
+      this.view2Screen.classList.add("active");
     });
-    app2.addEventListener("click", (event) => {
-      event.preventDefault();
-      prepare1_();
+    this.closeview2.addEventListener("click", () => {
+      this.view2Screen.classList.remove("active");
     });
-    IV1.addEventListener("input", (event) => {
+    this.app1.addEventListener("click", (event) => {
       event.preventDefault();
-      encrypt();
+      this.prepare2_();
     });
-    alphabet1.addEventListener("input", (event) => {
+    this.app2.addEventListener("click", (event) => {
       event.preventDefault();
-      encrypt();
+      this.prepare1_();
     });
-    plaintext1.addEventListener("input", (event) => {
+    this.IV1.addEventListener("input", (event) => {
+      event.preventDefault();
+      this.encrypt();
+    });
+    this.alphabet1.addEventListener("input", (event) => {
+      event.preventDefault();
+      this.encrypt();
+    });
+    this.plaintext1.addEventListener("input", (event) => {
       event.preventDefault();
       this.sha_plaintext1.value = hex(default_plaintext);
-      encrypt();
+      this.encrypt();
     });
-    randomize.addEventListener("click", (event) => {
+    this.randomize.addEventListener("click", (event) => {
       event.preventDefault();
       this.IV1.value = random_value();
-      encrypt();
+      this.encrypt();
     });
-    alphabet_default.addEventListener("click", (event) => {
+    this.alphabet_default.addEventListener("click", (event) => {
       event.preventDefault();
       var plaintext = default_plaintext;
       var alphabet = default_alphabet;
       this.alphabet1.value = alphabet.join("");
       this.plaintext1.value = plaintext;
       this.sha_plaintext1.value = hex(plaintext);
-      encrypt();
+      this.encrypt();
     });
-    alphabet_basic.addEventListener("click", (event) => {
+    this.alphabet_basic.addEventListener("click", (event) => {
       event.preventDefault();
       var plaintext = "This is a text.";
-      var alphabet =
-        "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n";
+      var alphabet = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890 .\n";
       this.alphabet1.value = alphabet;
       this.plaintext1.value = plaintext;
       this.sha_plaintext1.value = hex(plaintext);
-      encrypt();
+      this.encrypt();
     });
     this.alphabet_random.addEventListener("click", (event) => {
       event.preventDefault();
       var alphabet = random_alphabet([...this.alphabet1.value]);
       this.alphabet1.value = alphabet.join("");
-      encrypt();
+      this.encrypt();
     });
     this.shift1.addEventListener("change", (event) => {
       event.preventDefault();
-      encrypt();
+      this.encrypt();
     });
-    this.encrypt.addEventListener("click", (event) => {
+    this.encrypt1.addEventListener("click", (event) => {
       event.preventDefault();
-      encrypt();
+      this.encrypt();
     });
-    this.decrypt.addEventListener("click", (event) => {
+    this.decrypt1.addEventListener("click", (event) => {
       event.preventDefault();
-      decrypt();
+      this.decrypt();
     });
     this.sha_plaintext1.readOnly = true;
+    this.init_();
+    this.encrypt();
+    this.prepare2_();
+    this.decrypt();
+    this.main.classList.add("active");
+  },
+  init_: function () {
+    this.alphabet1.value = default_alphabet.join("");
+    this.plaintext1.value = default_plaintext;
+    this.sha_plaintext1.value = hex(default_plaintext);
+    this.IV1.value = 1;
+    this.shift1.value = 1;
+    this.IV2.value = 1;
+    this.shift2.value = 1;
+    this.plaintext2.value = null;
+    this.output2.value = null;
+  },
+  prepare1_: function () {
+    this.IV1.value = this.IV2.value;
+    this.shift1.value = this.shift2.value;
+    this.alphabet1.value = this.alphabet2.value;
+    this.plaintext1.value = this.output2.value;
+    this.sha_plaintext1.value = hex(this.sha_plaintext2.value);
+  },
+  prepare2_: function () {
+    this.IV2.value = this.IV1.value;
+    this.shift2.value = this.shift1.value;
+    this.alphabet2.value = this.alphabet1.value;
+    this.plaintext2.value = this.output1.value;
+    this.sha_plaintext2.value = this.sha_plaintext1.value;
   },
   update_chart1: function (array) {
     return update_chart(this.chart1)(array);
@@ -361,6 +380,29 @@ const ux = {
   update_chart4: function (array) {
     return update_chart(this.chart4)(array);
   },
+  encrypt: function () {
+    try {
+      this.output1.value = chipher.encrypt(this.plaintext1.value, this.IV1.value, this.shift1.value, this.alphabet1.value).join("");
+      this.text1.value = encode_base58(te.encode(this.output1.value));
+    } catch (_ex) {
+      console.log(_ex);
+      this.output1.value = "";
+    }
+    this.update_chart1([...this.output1.value]);
+    this.update_chart3([...this.output1.value]);
+  },
+  decrypt: function () {
+    var input = "";
+    try {
+      this.output2.value = chipher.decrypt([...this.plaintext2.value], this.IV2.value, this.shift2.value, this.alphabet2.value).join("");
+      this.text2.value = td.decode(decode_base58(this.text1.value));
+    } catch (_ex) {
+      console.log(_ex);
+      this.output2.value = "";
+    }
+    this.update_chart2([...this.output2.value]);
+    this.update_chart4([...this.output2.value]);
+  },
 };
 
 function load_(file) {
@@ -369,12 +411,10 @@ function load_(file) {
       const json = JSON.parse(content);
       plaintext2.value = json.cipher;
       sha_plaintext2.value = json.sha;
-      alphabet2.value = json.key
-        ? [...json.key].join("")
-        : [...default_alphabet].join("");
+      alphabet2.value = json.key ? [...json.key].join("") : [...default_alphabet].join("");
       shift2.value = json.shift ? parseInt(json.shift, 10) : 1;
       IV2.value = json.iv ? parseInt(json.iv, 10) : 1;
-      decrypt();
+      this.decrypt();
     })
     .catch((error) => console.log(error));
 }
@@ -388,80 +428,8 @@ function read(file) {
   });
 }
 
-function init_() {
-  alphabet1.value = default_alphabet.join("");
-  plaintext1.value = default_plaintext;
-  sha_plaintext1.value = hex(default_plaintext);
-  IV1.value = 1;
-  shift1.value = 1;
-  IV2.value = 1;
-  shift2.value = 1;
-  plaintext2.value = null;
-  output2.value = null;
-}
-
-function prepare1_() {
-  IV1.value = IV2.value;
-  shift1.value = shift2.value;
-  alphabet1.value = alphabet2.value;
-  plaintext1.value = output2.value;
-  sha_plaintext1.value = hex(sha_plaintext2.value);
-}
-
-function prepare2_() {
-  IV2.value = IV1.value;
-  shift2.value = shift1.value;
-  alphabet2.value = alphabet1.value;
-  plaintext2.value = output1.value;
-  sha_plaintext2.value = sha_plaintext1.value;
-  output2.value = null;
-}
-
-function encrypt() {
-  try {
-    ux.output1.value = chipher
-      .encrypt(
-        ux.plaintext1.value,
-        ux.IV1.value,
-        ux.shift1.value,
-        ux.alphabet1.value,
-      )
-      .join("");
-    ux.text1.value = encode_base58(te.encode(ux.output1.value));
-  } catch (_ex) {
-    console.log(_ex);
-    ux.output1.value = "";
-  }
-  ux.update_chart1([...ux.output1.value]);
-  ux.update_chart3([...ux.output1.value]);
-}
-
-function decrypt() {
-  var input = "";
-  try {
-    ux.output2.value = chipher
-      .decrypt(
-        [...ux.plaintext2.value],
-        ux.IV2.value,
-        ux.shift2.value,
-        ux.alphabet2.value,
-      )
-      .join("");
-    ux.text2.value = td.decode(decode_base58(ux.text1.value));
-  } catch (_ex) {
-    console.log(_ex);
-    ux.output2.value = "";
-  }
-  ux.update_chart2([...ux.output2.value]);
-  ux.update_chart4([...ux.output2.value]);
-}
-
 export function ui() {
   ux.init();
-  init_();
-  encrypt();
-  prepare2_();
-  decrypt();
 }
 
 export { ux };

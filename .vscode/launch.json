@@ -20,11 +20,14 @@
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"],
       "serverReadyAction": {
-        "pattern": "Local:\\s+(https?://\\S+)",
+        "pattern": "Local:\\s+(https?://\\S+)", // Регулярка сама поймет и http,/ и https
         "uriFormat": "%s",
         "action": "debugWithChrome",
         "webRoot": "${workspaceFolder}",
         "killOnServerStop": true
+      },
+      "presentation": {
+        "closeTerminalOnTerminate": true
       }
     }
   ]
