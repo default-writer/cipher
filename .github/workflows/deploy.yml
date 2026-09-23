@@ -22,15 +22,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          node-version: 24
-          cache: 'npm'
+        uses: actions/checkout@v4 # Убрали лишние node-version и cache отсюда
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 24 # Здесь это настроено правильно!
           cache: 'npm'
 
       - name: Install dependencies
@@ -42,12 +39,8 @@ jobs:
       - name: Upload production-ready files
         uses: actions/upload-pages-artifact@v3
         with:
-          node-version: 24
-          path: './dist' # Папка, куда Vite собирает билд
+          path: './dist' # Убрали лишний node-version отсюда
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          node-version: 24
-          cache: 'npm'
+        uses: actions/deploy-pages@v4 # Убрали лишние node-version и cache отсюда
