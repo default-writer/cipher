@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          node-version: 24
+          cache: 'npm'
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -39,8 +42,12 @@ jobs:
       - name: Upload production-ready files
         uses: actions/upload-pages-artifact@v3
         with:
+          node-version: 24
           path: './dist' # Папка, куда Vite собирает билд
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          node-version: 24
+          cache: 'npm'
