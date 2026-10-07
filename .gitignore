@@ -2,3 +2,6 @@
 /.history/
 /dist/
 /coverage/
+*.exe
+*.o
+*.txt
