@@ -118,7 +118,7 @@ namespace cipher {
       std::ofstream out(path, std::ios::binary);
       if (!out.is_open())
         return false;
-      out.write(data.data(), static_cast<std::streamsize>(data.size()));
+      out.write(reinterpret_cast<const char *>(data.data()), static_cast<std::streamsize>(data.size()));
       return static_cast<bool>(out);
     }
   } // namespace

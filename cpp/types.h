@@ -3,6 +3,6 @@
 
 #include <vector>
 
-typedef std::vector<char> Bytes;
+typedef std::vector<uint8_t> Bytes;
 
 #endif
