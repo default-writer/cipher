@@ -3,5 +3,6 @@
 /dist/
 /coverage/
 *.exe
+*.pdb
 *.o
 *.txt
