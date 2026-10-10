@@ -1,11 +1,15 @@
 #include <algorithm>
+#include <cctype>
 #include <chrono>
+#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <numeric>
 #include <random>
+#include <sstream>
+#include <string>
 #include <vector>
 
 #include "types.h"
@@ -15,6 +19,53 @@ namespace cipher {
   extern Bytes decrypt_(const Bytes &input, int iv, int shift, const std::string &alphabet);
 
   namespace {
+    std::vector<std::string> load_word_list(const std::string &filename) {
+      std::vector<std::string> words;
+      std::ifstream file(filename);
+
+      if (!file.is_open()) {
+        std::cerr << "Не удалось открыть файл: " << filename << std::endl;
+        return words;
+      }
+
+      std::string word;
+      while (std::getline(file, word)) {
+
+        if (!word.empty()) {
+          words.push_back(word);
+        }
+      }
+
+      file.close();
+      return words;
+    }
+
+    Bytes generate_text_from_words(const std::vector<std::string> &words, std::size_t target_size, std::uint32_t seed = std::mt19937::default_seed) {
+      Bytes out;
+      out.reserve(target_size + 64);
+      if (words.empty())
+        return out;
+
+      std::mt19937 rng(seed);
+      std::uniform_int_distribution<std::size_t> pick_word(0, words.size() - 1);
+      std::uniform_int_distribution<int> pick_line_len(8, 14);
+
+      while (out.size() < target_size) {
+        int line_words = pick_line_len(rng);
+        for (int i = 0; i < line_words && out.size() < target_size; ++i) {
+          const std::string &w = words[pick_word(rng)];
+          if (i > 0)
+            out.push_back(' ');
+          std::size_t remaining = target_size - out.size();
+          std::size_t take = std::min(w.size(), remaining);
+          out.insert(out.end(), w.begin(), w.begin() + take);
+        }
+        if (out.size() < target_size)
+          out.push_back('\n');
+      }
+      return out;
+    }
+
     std::size_t bulk_swap(Bytes &buf, const Bytes &orig, std::size_t partLength, char target_char, char replacement, std::mt19937 &rng, std::size_t max_changes) {
       if (max_changes == 0 || partLength == 0)
         return 0;
@@ -60,8 +111,7 @@ namespace cipher {
 
     Bytes read_file(const std::string &path) {
       std::ifstream in(path, std::ios::binary);
-      return Bytes((std::istreambuf_iterator<char>(in)),
-                   std::istreambuf_iterator<char>());
+      return Bytes((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
     }
 
     bool write_file(const std::string &path, const Bytes &data) {
@@ -72,6 +122,7 @@ namespace cipher {
       return static_cast<bool>(out);
     }
   } // namespace
+
   bool is_valid_decryption(const Bytes &candidate, const Bytes &original_plain, int iv, int shift, const std::string &alphabet) {
     try {
       Bytes decrypted = cipher::decrypt_(candidate, iv, shift, alphabet);
@@ -84,8 +135,7 @@ namespace cipher {
   int run_distribution(const std::string &input_file) {
     std::ifstream infile(input_file, std::ios::binary);
     if (!infile.is_open()) {
-      std::cerr << "Error: could not open file " << input_file
-                << " for distribution analysis.\n";
+      std::cerr << "Error: could not open file " << input_file << " for distribution analysis.\n";
       return 1;
     }
 
@@ -107,8 +157,7 @@ namespace cipher {
     std::cout << "\n=== Character Distribution in " << input_file << " ===\n";
     std::cout << "Total characters analyzed: " << total_chars << "\n";
     std::cout << std::endl;
-    std::cout << std::left << std::setw(12) << "Char (ASCII)" << " | "
-              << "Count" << " | " << "Percentage" << "\n";
+    std::cout << std::left << std::setw(12) << "Char (ASCII)" << " | " << "Count" << " | " << "Percentage" << "\n";
     std::cout << "-------------------------------------------\n";
 
     for (const auto &[symbol, count] : frequencies) {
@@ -122,12 +171,9 @@ namespace cipher {
       else if (symbol == ' ')
         char_desc = "  (32)";
       else
-        char_desc = std::string(1, symbol) + " (" +
-                    std::to_string((unsigned char)symbol) + ")";
+        char_desc = std::string(1, symbol) + " (" + std::to_string((unsigned char)symbol) + ")";
 
-      std::cout << std::left << std::setw(12) << char_desc << " | "
-                << std::setw(5) << count << " | "
-                << std::fixed << std::setprecision(2) << percentage << "%\n";
+      std::cout << std::left << std::setw(12) << char_desc << " | " << std::setw(5) << count << " | " << std::fixed << std::setprecision(2) << percentage << "%\n";
     }
     std::cout << "===========================================\n";
     return 0;
@@ -135,18 +181,9 @@ namespace cipher {
 
   int run_benchmark(int iv, int shift, const std::string &alphabet, const std::string &input_file, const std::string &output_file) {
     std::cout << "Generating 100 KB of test plain text...\n";
-    Bytes test_plain;
-    test_plain.reserve(102400);
-    std::string sample =
-        "The atmosphere of Mars is about 100 times thinner than Earth's, "
-        "and it is 95 percent carbon dioxide.\n";
-    while (test_plain.size() < 102400) {
-      for (char c : sample) {
-        if (test_plain.size() >= 102400)
-          break;
-        test_plain.push_back(c);
-      }
-    }
+
+    auto all_words = load_word_list("words.txt");
+    Bytes test_plain = generate_text_from_words(all_words, 102400);
 
     const std::string bench_input_file = "benchmark_" + input_file;
     const std::string bench_output_file = "benchmark_" + output_file;
@@ -160,17 +197,14 @@ namespace cipher {
     auto end_enc = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double, std::milli> duration_enc = end_enc - start_enc;
-    double speed_enc = (static_cast<double>(test_plain.size()) / 1024.0) /
-                       (duration_enc.count() / 1000.0);
+    double speed_enc = (static_cast<double>(test_plain.size()) / 1024.0) / (duration_enc.count() / 1000.0);
 
     std::cout << "Input Size      : " << test_plain.size() << " bytes\n";
     std::cout << "Output Size     : " << ciphertext.size() << " bytes\n\n";
 
     std::cout << "--- ENCRYPTION ---\n";
-    std::cout << "Time Elapsed    : " << std::fixed << std::setprecision(3)
-              << duration_enc.count() << " ms\n";
-    std::cout << "Throughput      : " << std::fixed << std::setprecision(2)
-              << speed_enc << " KB/sec\n\n";
+    std::cout << "Time Elapsed    : " << std::fixed << std::setprecision(3) << duration_enc.count() << " ms\n";
+    std::cout << "Throughput      : " << std::fixed << std::setprecision(2) << speed_enc << " KB/sec\n\n";
 
     Bytes obfuscated = ciphertext;
     write_file(bench_output_file, obfuscated);
@@ -180,18 +214,14 @@ namespace cipher {
     auto end_dec = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double, std::milli> duration_dec = end_dec - start_dec;
-    double speed_dec = (static_cast<double>(decrypted.size()) / 1024.0) /
-                       (duration_dec.count() / 1000.0);
+    double speed_dec = (static_cast<double>(decrypted.size()) / 1024.0) / (duration_dec.count() / 1000.0);
 
     std::cout << "--- DECRYPTION ---\n";
-    std::cout << "Time Elapsed    : " << std::fixed << std::setprecision(3)
-              << duration_dec.count() << " ms\n";
-    std::cout << "Throughput      : " << std::fixed << std::setprecision(2)
-              << speed_dec << " KB/sec\n\n";
+    std::cout << "Time Elapsed    : " << std::fixed << std::setprecision(3) << duration_dec.count() << " ms\n";
+    std::cout << "Throughput      : " << std::fixed << std::setprecision(2) << speed_dec << " KB/sec\n\n";
 
     std::cout << "--- TEST ---\n";
-    std::cout << "Integrity Check : "
-              << (decrypted == test_plain ? "PASSED" : "FAILED") << "\n";
+    std::cout << "Integrity Check : " << (decrypted == test_plain ? "PASSED" : "FAILED") << "\n";
     std::cout << "Saved plain     : " << bench_input_file << "\n";
     std::cout << "Saved obfuscated: " << bench_output_file << "\n\n";
     return 0;
@@ -273,8 +303,7 @@ namespace cipher {
   int run_obfuscate(int iv, int shift, const std::string &alphabet, const std::string &input_file, const std::string &output_file) {
     Bytes text = read_file(input_file);
     if (text.empty()) {
-      std::cerr << "Error: obfuscate requires '" << input_file
-                << "' as ciphertext source (empty or unreadable).\n";
+      std::cerr << "Error: obfuscate requires '" << input_file << "' as ciphertext source (empty or unreadable).\n";
       return 1;
     }
 
@@ -282,8 +311,7 @@ namespace cipher {
     try {
       reference_plain = cipher::decrypt_(text, iv, shift, alphabet);
     } catch (const std::exception &e) {
-      std::cerr << "Error: initial ciphertext does not decrypt: "
-                << e.what() << "\n";
+      std::cerr << "Error: initial ciphertext does not decrypt: " << e.what() << "\n";
       return 1;
     }
 
@@ -292,7 +320,7 @@ namespace cipher {
     const int max_safety_counter = 10000;
     const std::size_t partLength = text.size() / 5;
 
-    const Bytes original = text; // <-- СНИМОК до любых изменений
+    const Bytes original = text;
 
     std::cout << "Starting obfuscation loop...\n";
 
@@ -317,8 +345,7 @@ namespace cipher {
         min_count = 0;
 
       if (max_count - min_count <= 1) {
-        std::cout << "Obfuscation successfully passed in " << iterations
-                  << " cycles.\n";
+        std::cout << "Obfuscation successfully passed in " << iterations << " cycles.\n";
         break;
       }
 
@@ -352,9 +379,7 @@ namespace cipher {
         max_changes = 1;
 
       Bytes candidate = text;
-      std::size_t changes = bulk_swap(candidate, original, partLength,
-                                      target_char, replacement,
-                                      rng, max_changes);
+      std::size_t changes = bulk_swap(candidate, original, partLength, target_char, replacement, rng, max_changes);
       if (changes == 0)
         break;
 

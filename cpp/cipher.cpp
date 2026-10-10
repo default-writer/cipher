@@ -66,8 +66,7 @@ namespace cipher {
     Prng local_rnd(iv);
     for (int i = 0; i < shift; ++i) {
       for (std::size_t idx = start_pos; idx < end_pos; ++idx) {
-        array[idx] = encrypt ? shift_encrypt(array[idx], alphabet, lut, local_rnd)
-                             : shift_decrypt(array[idx], alphabet, lut, local_rnd);
+        array[idx] = encrypt ? shift_encrypt(array[idx], alphabet, lut, local_rnd) : shift_decrypt(array[idx], alphabet, lut, local_rnd);
       }
     }
   }
